@@ -1,0 +1,44 @@
+compile option
+g++/gcc -g a.c
+
+commands
+1. gdb a.out : debugging start
+2. b(reak) main, b line#, b srcfile:line#, b +offset/-offset, b *address
+   : break main, 
+3. r(un) : run now
+4. s : go one step, step into func
+5. n : step over function, 
+   finish : complete current function and return
+   return : abort current function and return
+6. p var : print var
+   p (int) exp : print signed int form
+   p/t : print binary form
+   p/x : print hexa form
+   p/d : print unsigned int form
+   p/c : ascii form
+   p $eax : print the value of stored in the 'eax' register
+   p *(int*)0x8ff4bc10 : print the value stored at memory addr 0x8ff...
+7. c(ontinue) : continue to next break point
+8. gdb core a.out : gdb core dump
+9. where : show stack, show sequence of func calls
+10. frame : show all stack frames
+11. untile line# : execute program until line#
+12. list : list next/previous few lines of program
+13. x <var, mem addr> : display the contents of the mem location
+    ex) assuem s1="hello there"
+    x/s s1 : hello there
+    x/d s1 : 72
+    x/8d s1 : 72 101 108 111 32 84 104
+14. display <exp> : auto display of <exp> each time a break point reached
+15. info locals : show local variables
+    info frame : show stack frame
+    info args : show arg values
+    info registers : show registers
+    info b : show break points
+16 set <var> to <exp> : set <var> = <exp>
+17. delete breakpoint# : delete breakpoint#
+    clear : delete all breakpoints
+    clear func :
+    clear filename:func : clear
+    clear line#
+    clear filename:line#
