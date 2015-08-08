@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
+
+/* max random number */
+#define RNUM 100
 
 #define MAX(A, B) (((A)>(B))?(A):(B))
 
@@ -19,14 +23,69 @@ struct tnode{
 };
 
 struct tnode *root = NULL;
+struct tnode *prev = NULL;
+
+void traverse(struct tnode *pn);
+
+int chkht(struct tnode *pn)
+{
+	struct tnode *cur = pn;
+	int ret, ht;
+
+	ret = 1;
+
+	if(!cur) return;
+
+	if(!cur->left && cur->right) {
+		ht = cur->right->ht + 1;
+	} else if(!cur->right && cur->left) {
+		ht = cur->left->ht + 1;
+	} else if(!cur->right && !cur->left) {
+		ht = 0;
+	} else {
+		ht = MAX(cur->right->ht, cur->left->ht) + 1;
+	}
+
+	if(cur->ht != ht) {
+		printf("ht error !!!!!\n");
+	}
+}
 
 void setht(struct tnode *pn)
 {
-
 	if(!pn->left && pn->right) pn->ht = pn->right->ht + 1;
 	else if(!pn->right && pn->left) pn->ht = pn->left->ht + 1;
 	else if(!pn->right && !pn->left) pn->ht = 0;
 	else pn->ht = MAX(pn->right->ht, pn->left->ht) + 1;
+}
+
+void setht_successor(struct tnode *pn)
+{
+	struct tnode *cur = pn;
+
+	if(!cur) {
+		return;
+	} else {
+		setht_successor(cur->left);
+		setht(cur);
+	}
+}
+
+int calcbal(struct tnode *pn)
+{
+	int bal; 
+	struct tnode *cur = pn;
+
+	if(!cur->left && !cur->right) {
+		bal = 0;
+	} else if(!cur->left && cur->right) {
+		bal = cur->right->ht - (-1); /* height of NULL is -1 */
+	} else if(!cur->right && cur->left) {
+		bal = (-1) - cur->left->ht; /* height of NULL is -1 */
+	} else {
+		bal = cur->right->ht - cur->left->ht;
+	}
+	return bal;
 }
 
 /* rotate right for zig-zig (A, B, C) */
@@ -39,7 +98,7 @@ void setht(struct tnode *pn)
 void rr(struct tnode *pn)
 {
 	struct tnode *cur = pn;
-	struct tnode *temp1 = cur->left; /* for right child */
+	struct tnode *temp1 = cur->left; /* for left child */
 
 	if(cur->par) {
 		if(cur->par->right == cur) {
@@ -82,7 +141,7 @@ void rl(struct tnode *pn)
 	if(cur->par) {
 		if(cur->par->right == cur) {
 			cur->par->right = temp1;
-			temp1->par= cur->par;
+			temp1->par = cur->par;
 		} else {
 			cur->par->left = temp1;
 			temp1->par = cur->par;
@@ -123,8 +182,11 @@ void rrl(struct tnode *pn)
 
 	rr(temp1);
 	rl(cur);
+	/*
 	setht(cur);
+	setht(temp1);
 	setht(temp2);
+	*/
 }
 
 /* double rotate left and right for zig-zag(A, B, C) */
@@ -140,14 +202,16 @@ void rrl(struct tnode *pn)
 void rlr(struct tnode *pn)
 {
 	struct tnode *cur = pn;
-	struct tnode *temp1 = cur->right;
-	struct tnode *temp2 = temp1->left;
+	struct tnode *temp1 = cur->left;
+	struct tnode *temp2 = temp1->right;
 
 	rl(temp1);
 	rr(cur);
+	/*
 	setht(cur);
+	setht(temp1);
 	setht(temp2);
-
+	*/
 }
 
 void xinsert(struct tnode **pn, struct tnode tn)
@@ -158,6 +222,7 @@ void xinsert(struct tnode **pn, struct tnode tn)
 		cur = (struct tnode*)malloc(sizeof(struct tnode));
 		cur->left = NULL;
 		cur->right = NULL;
+		cur->par = NULL;
 		cur->key = tn.key;
 		strcpy(cur->name, tn.name);
 		/*cur->bal = 0;*/
@@ -166,6 +231,12 @@ void xinsert(struct tnode **pn, struct tnode tn)
 		*pn = cur;
 		return;
 	} else {
+		/* don't insert the same key */
+		if(tn.key == cur->key) {
+			/*printf("already there key : %d \n", tn.key);*/
+			return;
+		}
+
 		/* height increase when both children are null */
 		if(!cur->left && !cur->right) {
 			cur->ht += 1;
@@ -190,12 +261,10 @@ void xinsert(struct tnode **pn, struct tnode tn)
 				setht(cur);
 				cur->inc = 1;
 			}
-		}
+		} 
 
-		if(!cur->left && !cur->right) bal = 0;
-		else if(!cur->left) bal = cur->right->ht - (-1); /* height of NULL is -1 */
-		else if(!cur->right) bal = (-1) - cur->left->ht; /* height of NULL is -1 */
-		else bal = cur->right->ht - cur->left->ht;
+		bal = calcbal(cur);
+
 		/* need to check balance factor after recursive */
 		/* if balancing is broken */
 		if(bal == 2) {
@@ -253,6 +322,59 @@ struct tnode *findsuccessor(struct tnode *pn)
 	return cur;
 }
 
+int rebalance(struct tnode *pn)
+{
+	struct tnode *cur = pn;
+	struct tnode *temp;
+	int bal = 0, balanced = 1;
+
+	bal = calcbal(cur);
+
+	if(bal == 2) {
+		temp = cur->right;
+		/* rotation left is enough for rebalance */
+		if(temp->right && temp->left) {
+			if(cur->right->right->ht < cur->right->left->ht) {
+				/* case 1 : zig-zag */
+				rrl(cur);
+			} else { /* case 2 : zig-zig */
+				rl(cur);
+				/*bal = calcbal(cur);*/
+				/*if(bal > 2) printf("aa\n");*/
+			}
+		} else if(temp->right && !temp->left) {
+			/* case 2 : zig-zig */	
+			rl(cur);
+			/*bal = calcbal(cur);*/
+			/*if(bal > 2) printf("aa\n");*/
+		} else {
+			/* zig-zag */
+			rrl(cur);
+		}
+	} else if (bal == -2) {
+		temp = cur->left;
+		if(temp->right && temp->left) {
+			if(cur->left->left->ht < cur->left->right->ht) {
+				/* case 3 : zig-zag */
+				rlr(cur);
+			} else {
+				/* case 4 : zag-zag? */
+				rr(cur);
+				/*bal = calcbal(cur);*/
+				/*if(bal > 2) printf("aa\n");*/
+			}
+		} else if(temp->left && !temp->right) {
+			rr(cur);
+			/*bal = calcbal(cur);*/
+			/*if(bal > 2) printf("aa\n");*/
+		} else {
+			/* zig-zag */
+			rlr(cur);
+		}
+	}
+	return balanced;
+}
+
 void xdelete(struct tnode **pn, struct tnode tn)
 {
 	int bal = 0;
@@ -268,15 +390,18 @@ void xdelete(struct tnode **pn, struct tnode tn)
 			if(!cur->left && !cur->right) {
 				if(!cur->par) {/* there is only a root node */
 					free(cur);
+					/*prev = cur;*/
 					cur = NULL;
 					root = NULL;
 				} else if(cur->par->left == cur) {
 					cur->par->left = NULL;
 					free(cur);
+					/*prev = cur;*/
 					cur = NULL;
 				} else if(cur->par->right == cur) {
 					cur->par->right = NULL;
 					free(cur);
+					/*prev = cur;*/
 					cur = NULL;
 				} 
 				/* case 2 : if cur has only one child */
@@ -285,8 +410,7 @@ void xdelete(struct tnode **pn, struct tnode tn)
 					if(cur->par->left == cur) {
 						cur->par->left = cur->right;
 						cur->right->par = cur->par;
-					}
-					else {
+					} else {
 						cur->par->right = cur->right;
 						cur->right->par = cur->par;
 					}
@@ -295,6 +419,7 @@ void xdelete(struct tnode **pn, struct tnode tn)
 					cur->right->par = NULL;
 				}
 				free(cur);
+				/*prev = cur;*/
 				cur = NULL;
 				/* case 2 : if cur has only one child */
 			} else if(cur->left && !cur->right) {
@@ -302,16 +427,16 @@ void xdelete(struct tnode **pn, struct tnode tn)
 					if(cur->par->left == cur) {
 						cur->par->left = cur->left;
 						cur->left->par = cur->par;
-					}
-					else {
-						cur->par->right = cur->right;
-						cur->right->par = cur->par;
+					} else {
+						cur->par->right = cur->left;
+						cur->left->par = cur->par;
 					}
 				} else {/* corner case when par is null, i.e. cur is root. */
 					root = cur->left;
 					cur->left->par = NULL;
 				}
 				free(cur);
+				/*prev = cur;*/
 				cur = NULL;
 				/* case 3 : if cur has two children, replace it with successor */
 			} else {
@@ -340,9 +465,10 @@ void xdelete(struct tnode **pn, struct tnode tn)
 							successor->par = NULL;
 						}
 						free(cur);
+						/*prev = cur;*/
 						cur = NULL;
 						/* recalc successor & right child's height. */
-						setht(successor->right);
+						setht_successor(successor->right);
 						setht(successor);
 					} else {
 						/* if successor is right child of cur */
@@ -364,6 +490,7 @@ void xdelete(struct tnode **pn, struct tnode tn)
 						}
 
 						free(cur);
+						/*prev = cur;*/
 						cur = NULL;
 						/* recalc only successor(right child) height. 
 						   right child is a successor. */
@@ -378,43 +505,22 @@ void xdelete(struct tnode **pn, struct tnode tn)
 			xdelete(&cur->right, tn);
 			setht(cur);
 		}
-		if(cur) {
-			if(!cur->left && !cur->right) bal = 0;
-			else if(!cur->left && cur->right) bal = cur->right->ht - (-1); /* height of NULL is -1 */
-			else if(!cur->right && cur->left) bal = (-1) - cur->left->ht; /* height of NULL is -1 */
-			else bal = cur->right->ht - cur->left->ht;
 
-			if(bal == 2) {
-				temp = cur->right;
-				/* rotation left is enough for rebalance */
-				if(temp->right && temp->left) {
-					if(cur->right->right->ht < cur->right->left->ht) {
-						/* case 1 : zig-zag */
-						rrl(cur);
-					} else { /* case 2 : zig-zig */
-						rl(cur);
-					}
-				} else if(temp->right && !temp->left) {
-					/* case 2 : zig-zig */	
-					rl(cur);
+		chkht(cur);
+
+		if(cur) {
+			bal = calcbal(cur);
+			if(bal == 2 || bal == -2) {
+				rebalance(cur);
+				/* rebalance one time is not enough in some cases. 
+				   need to rebalance again.
+				 */
+				if(cur == cur->par->left) {
+					rebalance(cur->par->right);
 				} else {
-					rrl(cur);
+					rebalance(cur->par->left);
 				}
-			} else if (bal == -2) {
-				temp = cur->left;
-				if(temp->right && temp->left) {
-					if(cur->left->left->ht < cur->left->right->ht) {
-						/* case 3 : zig-zag */
-						rlr(cur);
-					} else {
-						/* case 4 : zag-zag? */
-						rr(cur);
-					}
-				} else if(temp->left && !temp->right) {
-					rr(cur);
-				} else {
-					rlr(cur);
-				}
+				rebalance(cur->par);
 			}
 		}
 	}
@@ -507,18 +613,51 @@ void deletetree(struct tnode *pn)
 	else {
 		deletetree(pn->left);
 		temp = pn->right;
+		printf("delete tree : %s, key : %d\n", pn->name, pn->key);
 		free(pn);
+		pn = NULL;
 		deletetree(temp);
 	}
 }
 
 void traverse(struct tnode *pn)
 {
-	if(!pn) return;
+	int ht;
+	int bal = 0;
+	struct tnode *cur = pn;
+	if(!cur) return;
 	else {
-		traverse(pn->left);
-		printf("cur is %s, key : %d\n", pn->name, pn->key);
-		traverse(pn->right);
+		traverse(cur->left);
+		if(!cur->left && cur->right) {
+			ht = cur->right->ht + 1;
+			bal = cur->right->ht - (-1);
+		}
+		else if(!cur->right && cur->left) {
+			ht = cur->left->ht + 1;
+			bal = (-1) - cur->left->ht;
+		}
+		else if(!cur->right && !cur->left) {
+			ht = 0;
+			bal = 0;
+		}
+		else {
+			ht = MAX(cur->right->ht, cur->left->ht) + 1;
+			bal = cur->right->ht - cur->left->ht;
+		}
+
+		if(cur->ht != ht) {
+			printf("ht is inconsistent\n");
+			printf("cur is %s, key : %d\n", cur->name, cur->key);
+		}
+		if(bal >=2 || bal <= -2) {
+			printf("before bal is : %d \n", bal);
+			rebalance(cur);
+			printf("rebalance\n");
+			bal = calcbal(cur);
+			printf("after bal is : %d \n", bal);
+			printf("cur is %s, key : %d\n", cur->name, cur->key);
+		}
+		traverse(cur->right);
 	}
 }
 
@@ -527,42 +666,60 @@ int main()
 	int i, c, key;
 	char name[16];
 	struct tnode tn;
-	struct tnode *pn;
+	float rn, stretch = 1000;
+#if 0
 	tn.name[0] = 'a'-1;
-
-#if 1
-	for(i=0 ; i<26 ; i++) {
-		tn.name[0] += 1; 
-		tn.name[1] = '\0';
+	for(i=0 ; i<100 ; i++) {
+		sprintf(tn.name, "%d", i);
 		tn.key = i+1;
 		//xinsertn(tn);
 		xinsert(&root, tn);
 	}
+
 #endif
+#if 0
 	c = getchar();
 	while(c != 'q') {
-		if(c == 'p') {
-			printf("input name :");
+		if(c == 'i') {
+			printf("insert name : \n");
 			scanf("%s", tn.name);
-			printf("input key : ");
+			printf("insert key : \n");
 			scanf("%d", &tn.key);
-			/*xinsertn(tn);*/
 			xinsert(&root, tn);
 		} else if(c == 'd') {
-			printf("remove key : ");
+			printf("delete key : \n");
 			scanf("%d", &tn.key);
-			/*delmerge(tn);*/
 			xdelete(&root, tn);
-		} else if(c == 's') {
-			printf("search key : ");
-			scanf("%d", &tn.key);
-			pn = search(tn);
-			if(pn) printf("search name : %s\n",pn->name);
-			else printf("key %d is not in tree\n", tn.key);
 		}
 		c = getchar();
+		traverse(root);
 	}
-	traverse(root);
+#endif
+#if 1
+	srand(time(NULL));
+	
+	do {
+		/*deletetree(root);*/
+		for(i=0 ; i<1000; i++) {
+			/* insert node */
+			rn = (float)((float)rand()/(float)RAND_MAX*stretch);
+			tn.key = (int)rn;
+			sprintf(tn.name, "%d", i);
+			xinsert(&root, tn);
+		}
+		for(i=0 ; i<1000; i++) {
+			/* delete node */
+	/*printf("delete node \n");*/
+			rn = (float)((float)rand()/(float)RAND_MAX*stretch);
+			tn.key = (int)rn;
+			xdelete(&root, tn);
+		}
+		traverse(root);
+		printf("press enter to continue test \n");
+		c = getchar();
+	} while(c != 'q');
+#endif
+	/*traverse(root);*/
 	deletetree(root);
 	return 0;
 }
