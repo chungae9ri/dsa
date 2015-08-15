@@ -9,7 +9,6 @@
 using namespace std;
 #define LEN	16
 #define SWAP(t, A, B) { t temp = A; A = B; B = temp; }
-#define MAX(A, B) (((A)>(B))?(A):(B))
 
 template <typename T> class heap {
 	public:
@@ -20,7 +19,7 @@ template <typename T> class heap {
 		ph = new T[LEN];
 	}
 	~heap(){
-		delete(ph);
+		delete[] ph;
 	}
 	int pri;
 	void xinsert(T dat) {
