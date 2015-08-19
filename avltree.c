@@ -22,6 +22,8 @@ struct tnode{
 	int inc;
 };
 
+unsigned long cntinsert = 0;
+unsigned long cntdelete = 0;
 struct tnode *root = NULL;
 struct tnode *prev = NULL; 
 struct tnode *successor = NULL;
@@ -268,6 +270,7 @@ void xinsert(struct tnode **pn, struct tnode tn)
 		cur->ht = 0;
 		cur->inc = 0;
 		*pn = cur;
+		cntinsert++;
 		return;
 	} else {
 		/* don't insert the same key */
@@ -372,6 +375,7 @@ void xdelete(struct tnode **pn, struct tnode tn)
 		return;
 	} else {
 		if(cur->key == tn.key) {
+			cntdelete++;
 			/* case 1 : if cur is leaf*/
 			if(!cur->left && !cur->right) {
 				if(!cur->par) {/* there is only a root node */
@@ -699,12 +703,13 @@ int main()
 			tn.key = (int)rn;
 			xdelete(&root, tn);
 		}
-		traverse(root);
+		/*traverse(root);*/
 		printf("press enter to continue test \n");
 		c = getchar();
 	} while(c != 'q');
 #endif
 	/*traverse(root);*/
 	deletetree(root);
+	printf("insert %ld times, delete %ld times\n",cntinsert, cntdelete);
 	return 0;
 }
