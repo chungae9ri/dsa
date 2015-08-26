@@ -1,27 +1,45 @@
 #include <iostream>
 #include <stdio.h>
+/* for RAND_MAX */
+#include <stdlib.h>
+/* for using random number generator */
+#include <time.h>
+
+/* max random number */
+#define RNUM 200	
+
 
 using namespace std;
-#define LEN 128
+#define MAXLEN	256 
 
 template <typename T> class Xsort{
-	T data[LEN];
+	T data[MAXLEN];
 	int len;
 	public :
 		Xsort(){
 			len = 0;
-			for(int i=0 ; i<LEN; i++)
+			for(int i=0 ; i<MAXLEN; i++)
 				data[i] = 0;
 		}
 		~Xsort(){}
 		void Xinsert(T in) {
-			if(len > LEN-1) return;
+			if(len > MAXLEN-1) return;
 			data[len++] = in;
 		}
 		void Xdisplay() {
 			for(int i=0 ; i<len; i++) {
 				cout << data[i] << endl;
 			}
+		}
+		void Xchksort() {
+			bool sorted = true;
+			for(int i=0 ; i<len-1 ; i++) {
+				if(data[i] > data[i+1]) {
+					sorted = false;
+					cout << "not sorted btwn " << i << " and " << i+1 << endl;
+				}
+			}
+			if(sorted) cout << "correctly sorted " << endl;
 		}
 		void Xswap(T &a, T &b) {
 			T temp;
@@ -95,6 +113,42 @@ template <typename T> class Xsort{
 			}
 #endif
 		}
+
+		/* shell sort = comb sort + insertion sort */
+		void Xshellsort() {
+#if 1
+			int h, i, j;
+			T t;
+			int step, seq[5]={5,4,3,2,1};
+			/*for(h=len ; h /= 2 ; ){*/
+			h = len;
+			while((h=(int)(h/2)) >= 1) { /* similiar with comb sort */
+				/* insertion sort with gap h */
+				for(i=h ; i<len ; i++) {
+					t = data[i];
+					for(j=i ; j>=h && t<data[j-h] ; j-=h) {
+						data[j] = data[j-h];
+					}
+					data[j] = t;
+				}
+			}
+#else
+			int step, i, j, inc;
+			int seq[5] = {5,4,3,2,1};
+			for (step = 0; seq[step] >= 1; step++) {
+				inc = seq[step];
+				for (i = inc; i < len ; i++) {
+					j = i;
+					T val = data[i];
+					while ((j >= inc) && val < data[j - inc]) {
+						data[j] = data[j - inc];
+						j -= inc;
+					}
+					data[j] = val;
+				}
+			}
+#endif
+		}
 };
 
 int main()
@@ -102,7 +156,7 @@ int main()
 	Xsort<int> data;
 	int c, d;
 
-#if 1
+#if 0
 	data.Xinsert(41);
 	data.Xinsert(11);
 	data.Xinsert(18);
@@ -122,10 +176,18 @@ int main()
 	data.Xinsert(31);
 	data.Xinsert(6);
 	data.Xinsert(10);
+#else
+	int in, i, stretch = 1024.f;
+	srand(time(NULL));
+	for(i=0 ; i<255 ; i++) {
+		in = (int)((float)(rand())/(float)RAND_MAX*stretch);
+		data.Xinsert(in);
+	}
+
 #endif
 	cout << "q : quit, i : insert data" << endl;
 	cout << "1 : selectionsort, 2 : insertionsort, 3 : bubblesort" << endl;
-	cout << "4 : combsort" << endl;
+	cout << "4 : combsort, 5 : shellsort" << endl;
 	c = getchar();
 	while(c != 'q') {
 		if(c == 'i') {
@@ -139,9 +201,12 @@ int main()
 			data.Xbubblesort();
 		} else if(c == '4') {
 			data.Xcombsort();
+		} else if(c == '5') {
+			data.Xshellsort();
 		}
 		c = getchar();
 	}
 	data.Xdisplay();
+	data.Xchksort();
 	return 0;
 }
