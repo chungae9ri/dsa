@@ -154,7 +154,7 @@ void dijkstraheap(int graph[][COL], int src)
 		for(u=0 ; u<ROW ; u++) {
 			/* if v and u are not connected, set distance infinite */
 			if(graph[v.id][u] == 0) graph[v.id][u] = INFINITE;
-			/* find out the location of u(neighbor) in heap */
+			/* find out the location of u(neighbor) in the heap */
 			for(i=0 ; i<hip.last ; i++) {
 				if(u == hip.ph[i].id) break;
 			}
@@ -244,7 +244,6 @@ int main()
 		{8, 11, 0, 0, 0, 0, 1, 0, 7},
 		{0, 0, 2, 0, 0, 0, 6, 7, 0}
 	};
-	heap<int> hip;
 	dijkstra(graph, 0);
 	dijkstraheap(graph, 0);
 

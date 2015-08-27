@@ -1,6 +1,6 @@
 /* max-heap(priority Q) is implemented.
    Bottom-up insert.
-   if the comprison is changed to less than from large than
+   if the comprison is changed to less-than from large-than
    the min-heap is accomplished.
  */
 #include <iostream>
@@ -22,6 +22,28 @@ template <typename T> class heap {
 		delete[] ph;
 	}
 	int pri;
+
+	void xswap(hNod<T> &lhs, hNod<T> &rhs) {
+		hNod<T> temp;
+		temp = lhs;
+		lhs = rhs;
+		rhs = temp;
+	}
+
+	void rearrange(int idx) {
+		int par, cur = idx;
+
+		par = (int)((cur-1)/2);
+		if(par <= 0) par = 0;
+
+		while(ph[par].dist > ph[cur].dist) {
+			xswap(ph[par], ph[cur]);
+			cur = par;
+			par = (int)((cur-1)/2);
+			if(par<0) break;
+		}
+	}
+
 	void xinsert(T dat) {
 		int par, cur = last;
 		ph[cur] = dat;
