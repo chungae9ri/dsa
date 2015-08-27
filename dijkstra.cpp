@@ -52,8 +52,11 @@ template <typename T> class heap {
 		rhs = temp;
 	}
 
+	/* this rearrange should be done on heap arrary. 
+	   If the arrary is not a heap, heapify() must be used.
+	 */
 	void rearrange(int idx) {
-		int par, cur = idx;
+		int par, cur = idx, lc, rc;
 
 		par = (int)((cur-1)/2);
 		if(par <= 0) par = 0;
@@ -63,6 +66,24 @@ template <typename T> class heap {
 			cur = par;
 			par = (int)((cur-1)/2);
 			if(par<0) break;
+		}
+
+		lc = cur*2+1;
+		rc = lc+1;
+		while(lc < last) {
+			if(ph[cur].dist <= ph[lc].dist && ph[cur].dist <= ph[rc].dist) {
+				break;
+			} else if(ph[rc].dist < ph[lc].dist) {
+				xswap(ph[cur], ph[rc]);
+				cur = rc;
+				lc = cur*2+1;
+				rc = lc + 1;
+			} else {
+				xswap(ph[cur], ph[lc]);
+				cur = lc;
+				lc = cur*2+1;
+				rc = lc + 1;
+			}
 		}
 	}
 

@@ -18,10 +18,43 @@ template <typename T> class heap {
 		last = 0;
 		ph = new T[LEN];
 	}
+	/* test constructor */
+	heap(int type) {
+		last = 0;
+		ph = new T[LEN];
+		ph[0] = 2;
+		ph[1] = 8;
+		ph[2] = 6;
+		ph[3] = 1;
+		ph[4] = 10;
+		ph[5] = 15;
+		ph[6] = 3;
+		ph[7] = 12;
+		ph[8] = 11;
+	}
 	~heap(){
 		delete[] ph;
 	}
-	int pri;
+
+	void xdisplay() {
+		for(int i=0 ; i<last ; i++) {
+			cout << ph[i] << endl;
+		}
+	}
+
+	void xheapify() {
+		int i, lchild, rchild;
+		int lastpar = (int)(last/2);
+		for(i=lastpar ; i>=0 ; i--) {
+			lchild = 2*i+1;
+			rchild = lchild+1;
+			if(ph[lchild] > ph[rchild] && ph[lchild] > ph[i]) {
+				xswap(ph[lchild], ph[i]);
+			} else if(ph[lchild] < ph[rchild] && ph[rchild] > ph[i]) {
+				xswap(ph[rchild], ph[i]);
+			}
+		}
+	}
 
 	void xswap(hNod<T> &lhs, hNod<T> &rhs) {
 		hNod<T> temp;
@@ -36,7 +69,7 @@ template <typename T> class heap {
 		par = (int)((cur-1)/2);
 		if(par <= 0) par = 0;
 
-		while(ph[par].dist > ph[cur].dist) {
+		while(ph[par] < ph[cur]) {
 			xswap(ph[par], ph[cur]);
 			cur = par;
 			par = (int)((cur-1)/2);
@@ -106,8 +139,13 @@ template <typename T> class heap {
 int main()
 {
 	int data, c, i;
-	heap<int> hip;
 #if 1
+	heap<int> hip(1);
+	hip.xheapify();
+
+#else
+	heap<int> hip;
+
 	hip.xinsert(2);
 	hip.xinsert(8);
 	hip.xinsert(6);
@@ -117,7 +155,6 @@ int main()
 	hip.xinsert(3);
 	hip.xinsert(12);
 	hip.xinsert(11);
-#endif
 
 	cout << "i:insert, d:dequeue, l:list up, q:quit" << endl;
 	c = getchar();
@@ -135,5 +172,6 @@ int main()
 		}
 		c = getchar();
 	}
+#endif
 	return 0;
 }
