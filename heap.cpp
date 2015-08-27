@@ -5,9 +5,11 @@
  */
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 using namespace std;
-#define LEN	16
+#define LEN	256	
 #define SWAP(t, A, B) { t temp = A; A = B; B = temp; }
 
 template <typename T> class heap {
@@ -22,6 +24,7 @@ template <typename T> class heap {
 	heap(int type) {
 		last = 0;
 		ph = new T[LEN];
+		/*
 		ph[0] = 2;
 		ph[1] = 8;
 		ph[2] = 6;
@@ -31,6 +34,14 @@ template <typename T> class heap {
 		ph[6] = 3;
 		ph[7] = 12;
 		ph[8] = 11;
+		last = 9;
+		*/
+		float stretch = 1000.0f;
+		srand(time(NULL));
+		for(int i=0 ; i< LEN ; i++) {
+			ph[i] = (int)(((float)rand()/(float)RAND_MAX)*stretch);
+		}
+		last = LEN;
 	}
 	~heap(){
 		delete[] ph;
@@ -42,29 +53,62 @@ template <typename T> class heap {
 		}
 	}
 
+	/* make a heap from an arbitrary array */
 	void xheapify() {
-		int i, lchild, rchild;
+		int i, j, lc, rc;
 		int lastpar = (int)(last/2);
 		for(i=lastpar ; i>=0 ; i--) {
-			lchild = 2*i+1;
-			rchild = lchild+1;
-			if(ph[lchild] > ph[rchild] && ph[lchild] > ph[i]) {
-				xswap(ph[lchild], ph[i]);
-			} else if(ph[lchild] < ph[rchild] && ph[rchild] > ph[i]) {
-				xswap(ph[rchild], ph[i]);
+			lc = 2*i+1;
+			rc = lc+1;
+			j = i;
+			if(rc >= last) rc = lc;
+			while(ph[j] < ph[lc] || ph[j] < ph[rc]) {
+				if(ph[lc] >= ph[rc] && ph[lc] > ph[j]) {
+					xswap(ph[lc], ph[j]);
+					j = lc;
+					lc = 2*j + 1;
+					rc = lc + 1;
+					if(lc >= last) break;
+
+				} else if(ph[lc] <= ph[rc] && ph[rc] > ph[j]) {
+					xswap(ph[rc], ph[j]);
+					j = rc;
+					lc = 2*j + 1;
+					rc = lc + 1;
+					if(lc >= last) break;
+				}
 			}
 		}
 	}
 
-	void xswap(hNod<T> &lhs, hNod<T> &rhs) {
-		hNod<T> temp;
+	void xchkheapify() {
+		bool b = true;
+		int rc, lc;
+		for(int i=0 ; i<(int)(last/2) ; i++) {
+			lc = 2*i + 1;
+			rc = lc + 1;
+			if(rc >= last) rc = lc;
+			if(ph[rc] > ph[i] || ph[lc] > ph[i]) {
+				b = false;
+				cout << "not heapify() in " << i << endl;
+			}
+		}
+		if(b) cout << "correct max heap." << endl;
+		else cout << " not correct max heap." << endl;
+	}
+
+	void xswap(T &lhs, T &rhs) {
+		T temp;
 		temp = lhs;
 		lhs = rhs;
 		rhs = temp;
 	}
 
+	/* this rearrange should be done on heap arrary. 
+	   If the arrary is not a heap, heapify() must be used.
+	 */
 	void rearrange(int idx) {
-		int par, cur = idx;
+		int par, cur = idx, lc, rc;
 
 		par = (int)((cur-1)/2);
 		if(par <= 0) par = 0;
@@ -74,6 +118,24 @@ template <typename T> class heap {
 			cur = par;
 			par = (int)((cur-1)/2);
 			if(par<0) break;
+		}
+	
+		lc = cur*2+1;
+		rc = lc+1;
+		while(lc < last) {
+			if(ph[cur] <= ph[lc] && ph[cur] <= ph[rc]) {
+				break;
+			} else if(ph[rc] < ph[lc]) {
+				xswap(ph[cur], ph[rc]);
+				cur = rc;
+				lc = cur*2+1;
+				rc = lc + 1;
+			} else {
+				xswap(ph[cur], ph[lc]);
+				cur = lc;
+				lc = cur*2+1;
+				rc = lc + 1;
+			}
 		}
 	}
 
@@ -142,7 +204,8 @@ int main()
 #if 1
 	heap<int> hip(1);
 	hip.xheapify();
-
+	hip.xdisplay();
+	hip.xchkheapify();
 #else
 	heap<int> hip;
 
