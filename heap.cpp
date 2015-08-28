@@ -9,7 +9,7 @@
 #include <time.h>
 
 using namespace std;
-#define LEN	256	
+#define LEN	1024	
 #define SWAP(t, A, B) { t temp = A; A = B; B = temp; }
 
 template <typename T> class heap {
@@ -24,7 +24,7 @@ template <typename T> class heap {
 	heap(int type) {
 		last = 0;
 		ph = new T[LEN];
-		/*
+#if 0
 		ph[0] = 2;
 		ph[1] = 8;
 		ph[2] = 6;
@@ -35,13 +35,14 @@ template <typename T> class heap {
 		ph[7] = 12;
 		ph[8] = 11;
 		last = 9;
-		*/
-		float stretch = 1000.0f;
+#else
+		float stretch = 2000.0f;
 		srand(time(NULL));
 		for(int i=0 ; i< LEN ; i++) {
 			ph[i] = (int)(((float)rand()/(float)RAND_MAX)*stretch);
 		}
 		last = LEN;
+#endif
 	}
 	~heap(){
 		delete[] ph;
@@ -52,32 +53,38 @@ template <typename T> class heap {
 			cout << ph[i] << endl;
 		}
 	}
+	 
+	void xmovedown(int idx, int stop ) {
+		int i, lc, rc;
+		if(idx == stop) return; 
+		lc = 2*idx+1;
+		rc = lc+1;
+		i = idx;
+		if(rc >= stop) rc = lc;
+		while(ph[i] < ph[lc] || ph[i] < ph[rc]) {
+			if(ph[lc] >= ph[rc] && ph[lc] > ph[i]) {
+				xswap(ph[lc], ph[i]);
+				i = lc;
+				lc = 2*i + 1;
+				rc = lc + 1;
+				if(lc >= stop) break;
+
+			} else if(ph[lc] <= ph[rc] && ph[rc] > ph[i]) {
+				xswap(ph[rc], ph[i]);
+				i = rc;
+				lc = 2*i + 1;
+				rc = lc + 1;
+				if(lc >= stop) break;
+			}
+		}
+	}
 
 	/* make a heap from an arbitrary array */
 	void xheapify() {
 		int i, j, lc, rc;
 		int lastpar = (int)(last/2);
 		for(i=lastpar ; i>=0 ; i--) {
-			lc = 2*i+1;
-			rc = lc+1;
-			j = i;
-			if(rc >= last) rc = lc;
-			while(ph[j] < ph[lc] || ph[j] < ph[rc]) {
-				if(ph[lc] >= ph[rc] && ph[lc] > ph[j]) {
-					xswap(ph[lc], ph[j]);
-					j = lc;
-					lc = 2*j + 1;
-					rc = lc + 1;
-					if(lc >= last) break;
-
-				} else if(ph[lc] <= ph[rc] && ph[rc] > ph[j]) {
-					xswap(ph[rc], ph[j]);
-					j = rc;
-					lc = 2*j + 1;
-					rc = lc + 1;
-					if(lc >= last) break;
-				}
-			}
+			xmovedown(i, last-1);
 		}
 	}
 
@@ -90,7 +97,7 @@ template <typename T> class heap {
 			if(rc >= last) rc = lc;
 			if(ph[rc] > ph[i] || ph[lc] > ph[i]) {
 				b = false;
-				cout << "not heapify() in " << i << endl;
+				cout << "not heap in " << i << endl;
 			}
 		}
 		if(b) cout << "correct max heap." << endl;
@@ -138,7 +145,7 @@ template <typename T> class heap {
 			}
 		}
 	}
-
+	/* move up*/
 	void xinsert(T dat) {
 		int par, cur = last;
 		ph[cur] = dat;
