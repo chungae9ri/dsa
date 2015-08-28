@@ -6,12 +6,12 @@
 #include <time.h>
 
 using namespace std;
-#define MAXLEN	256 
+#define MAXLEN		256
 
 template <typename T> class Xsort{
-	T data[MAXLEN];
-	int last;
 	public :
+		T data[MAXLEN];
+		int last;
 		Xsort(){
 			last = 0;
 			for(int i=0 ; i<MAXLEN; i++)
@@ -205,66 +205,87 @@ template <typename T> class Xsort{
 			if(b) cout << "correct max heap." << endl;
 			else cout << " not correct max heap." << endl;
 		}
+
+		void Xquicksort(T *a, int n) {
+			int i, j,k, p, t;
+			if (n < 2)
+				return;
+			p = a[n / 2];
+			for (i = 0, j = n - 1; ; i++, j--) {
+				while (a[i] < p)
+					i++;
+				while (p < a[j])
+					j--;
+				if (i >= j)
+					break;
+				Xswap(a[i], a[j]);
+			}
+			Xquicksort(a, i);
+			Xquicksort(a + i, n - i);
+		}
 };
 
 int main()
 {
-	Xsort<int> data;
+	Xsort<int> xsort;
 	int c, d;
 
 #if 0
 	data.Xinsert(41);
-	data.Xinsert(11);
-	data.Xinsert(18);
-	data.Xinsert(7);
-	data.Xinsert(16);
-	data.Xinsert(25);
-	data.Xinsert(4);
-	data.Xinsert(23);
-	data.Xinsert(32);
-	data.Xinsert(31);
-	data.Xinsert(22);
-	data.Xinsert(9);
-	data.Xinsert(1);
-	data.Xinsert(22);
-	data.Xinsert(3);
-	data.Xinsert(7);
-	data.Xinsert(31);
-	data.Xinsert(6);
-	data.Xinsert(10);
+	xsort.Xinsert(11);
+	xsort.Xinsert(18);
+	xsort.Xinsert(7);
+	xsort.Xinsert(16);
+	xsort.Xinsert(25);
+	xsort.Xinsert(4);
+	xsort.Xinsert(23);
+	xsort.Xinsert(32);
+	xsort.Xinsert(31);
+	xsort.Xinsert(22);
+	xsort.Xinsert(9);
+	xsort.Xinsert(1);
+	xsort.Xinsert(22);
+	xsort.Xinsert(3);
+	xsort.Xinsert(7);
+	xsort.Xinsert(31);
+	xsort.Xinsert(6);
+	xsort.Xinsert(10);
 #else
 	int in, i, stretch = 1024.f;
 	srand(time(NULL));
 	for(i=0 ; i<256 ; i++) {
 		in = (int)((float)(rand())/(float)RAND_MAX*stretch);
-		data.Xinsert(in);
+		xsort.Xinsert(in);
 	}
 
 #endif
 	cout << "q : quit, i : insert data" << endl;
 	cout << "1 : selectionsort, 2 : insertionsort, 3 : bubblesort" << endl;
 	cout << "4 : combsort, 5 : shellsort, 6 : heapsort" << endl;
+	cout << "7 : quicksort" << endl;
 	c = getchar();
 	while(c != 'q') {
 		if(c == 'i') {
 			scanf("%d", &d);
-			data.Xinsert(d);
+			xsort.Xinsert(d);
 		} else if(c == '1') {
-			data.Xselectionsort();
+			xsort.Xselectionsort();
 		} else if(c == '2') {
-			data.Xinsertionsort();
+			xsort.Xinsertionsort();
 		} else if(c == '3') {
-			data.Xbubblesort();
+			xsort.Xbubblesort();
 		} else if(c == '4') {
-			data.Xcombsort();
+			xsort.Xcombsort();
 		} else if(c == '5') {
-			data.Xshellsort();
+			xsort.Xshellsort();
 		} else if(c == '6') {
-			data.Xheapsort();
+			xsort.Xheapsort();
+		} else if(c == '7') {
+			xsort.Xquicksort(xsort.data, xsort.last);
 		}
 		c = getchar();
 	}
-	data.Xdisplay();
-	data.Xchksort();
+	xsort.Xdisplay();
+	xsort.Xchksort();
 	return 0;
 }
