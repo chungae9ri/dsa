@@ -6,7 +6,7 @@
 #include <time.h>
 
 using namespace std;
-#define MAXLEN		256
+#define MAXLEN		256	
 
 template <typename T> class Xsort{
 	public :
@@ -223,6 +223,26 @@ template <typename T> class Xsort{
 			Xquicksort(a, i);
 			Xquicksort(a + i, n - i);
 		}
+
+		void Xmergesort(T *a, int n) {
+			if(n < 2) return;
+			int m = (int)(n / 2);
+			Xmergesort(a, m);
+			Xmergesort(a + m, n - m);
+			Xmerge(a, n, m);
+		}
+
+		void Xmerge(T *a, int n, int m) {
+			int i, j, k;
+			int *x = (int *)malloc(n * sizeof (int));
+			for(i = 0, j = m, k = 0; k < 2*m; k++) {
+				x[k] = j == 2*m ? a[i++] : i == m ? a[j++] : a[j] < a[i] ? a[j++] : a[i++];
+			}
+			for(i = 0; i < 2*m; i++) {
+				a[i] = x[i];
+			}
+			free(x);
+		}
 };
 
 int main()
@@ -262,7 +282,7 @@ int main()
 	cout << "q : quit, i : insert data" << endl;
 	cout << "1 : selectionsort, 2 : insertionsort, 3 : bubblesort" << endl;
 	cout << "4 : combsort, 5 : shellsort, 6 : heapsort" << endl;
-	cout << "7 : quicksort" << endl;
+	cout << "7 : quicksort, 8 : mergesort" << endl;
 	c = getchar();
 	while(c != 'q') {
 		if(c == 'i') {
@@ -282,6 +302,8 @@ int main()
 			xsort.Xheapsort();
 		} else if(c == '7') {
 			xsort.Xquicksort(xsort.data, xsort.last);
+		} else if(c == '8') {
+			xsort.Xmergesort(xsort.data, xsort.last);
 		}
 		c = getchar();
 	}
