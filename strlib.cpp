@@ -54,10 +54,19 @@ char* strchr(char* p, int c)
 int atoi(char *str)
 {
 	int i;
-	int ret=0;
-	for(i=0 ; i!='\0' ; i++) {
-		ret = ret * 10 + str[i]-'0';
+	int ret = 0;
+	int bneg = 0; 
+
+	i=0;
+	if(str[i] == '-') {
+		bneg = 1;
+		i++;
 	}
+	while(str[i] != '\0') {
+		ret = ret * 10 + str[i]-'0';
+		i++;
+	}
+	if(bneg) ret *= -1;
 	return ret;
 }
 
@@ -99,7 +108,7 @@ void itoa(int num, char *buf, int base)
 
 int main()
 {
-	char a[128], b[128], c[16];
+	char a[128], b[128], c[16], d[16];
 	char *cat, *chr;
 	int cnt;
 	scanf("%s", a);
@@ -114,6 +123,9 @@ int main()
 	if(chr != NULL)
 		cout << "strchr(a, 'c') :" << *chr << endl;
 	free(cat);
+
+	sprintf(d, "%d", -12345);
+	cout << "atoi(-12345) : " << atoi(d) << endl;
 
 	itoa(-12345, c, 10);
 	cout << "itoa(-12345) : " << c << endl;
