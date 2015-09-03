@@ -244,6 +244,36 @@ template <typename T> class Xsort{
 
 		/* let's assume data type is integer */
 		void Xradixsort() {
+#if 1
+			int exp, mod, max = 0;
+			int count[10] = {0,};
+			T out[last];
+			int i;
+
+			for(i = 0 ; i < last ; i++) {
+				if(data[i] > max) max = data[i];
+			}
+
+			for(exp = 1 ; max/exp > 0 ; exp *= 10) {
+				for(i = 0 ; i < 10 ; i++)
+					count[i] = 0;
+				for(i = 0 ; i < last ; i++) {
+					count[(data[i]/exp)%10]++;
+				}
+				/* the last real index in data */
+				for(i = 1 ; i < 10 ; i++)
+					count[i] += count[i-1];
+				for(i = last - 1 ; i >= 0 ; i--) {
+					out[count[(data[i]/exp)%10] - 1] = data[i];
+					count[(data[i]/exp)%10]--;
+				}
+
+				for(i = 0 ; i < last ; i++) {
+					data[i] = out[i];
+				}
+			}
+
+#else
 			int exp, mod, max = 0;
 			/* queue for saving data of each mod */
 			int q0[last], q1[last], q2[last], q3[last], q4[last];
@@ -273,31 +303,32 @@ template <typename T> class Xsort{
 				l = a;
 				for(k = 0 ; k < b ; k++)
 					data[l + k] = q1[k];
-				l = a + b;
+				l +=  b;
 				for(k = 0 ; k < c ; k++)
 					data[l + k] = q2[k];
-				l = a + b + c;
+				l += c;
 				for(k = 0 ; k < d ; k++)
 					data[l + k] = q3[k];
-				l = a + b + c + d;
+				l += d;
 				for(k = 0 ; k < e ; k++)
 					data[l + k] = q4[k];
-				l = a + b + c + d + e;
+				l += e;
 				for(k = 0 ; k < f ; k++)
 					data[l + k] = q5[k];
-				l = a + b + c + d + e + f;
+				l += f;
 				for(k = 0 ; k < g ; k++)
 					data[l + k] = q6[k];
-				l = a + b + c + d + e + f + g;
+				l += g;
 				for(k = 0 ; k < h ; k++)
 					data[l + k] = q7[k];
-				l = a + b + c + d + e + f + g + h;
+				l += h;
 				for(k = 0 ; k < i ; k++)
 					data[l + k] = q8[k];
-				l = a + b + c + d + e + f + g + h + i;
+				l += i;
 				for(k = 0 ; k < j ; k++)
 					data[l + k] = q9[k];
 			}
+#endif
 		}
 };
 
