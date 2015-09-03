@@ -115,8 +115,6 @@ template <typename T> class Xsort{
 #if 1
 			int h, i, j;
 			T t;
-			int step, seq[5]={5,4,3,2,1};
-			/*for(h=last ; h /= 2 ; ){*/
 			h = last;
 			while((h=(int)(h/2)) >= 1) { /* similiar with comb sort */
 				/* insertion sort with gap h */
@@ -243,6 +241,64 @@ template <typename T> class Xsort{
 			}
 			free(x);
 		}
+
+		/* let's assume data type is integer */
+		void Xradixsort() {
+			int exp, mod, max = 0;
+			/* queue for saving data of each mod */
+			int q0[last], q1[last], q2[last], q3[last], q4[last];
+			int q5[last], q6[last], q7[last], q8[last], q9[last];
+			int a, b, c, d, e, f, g, h, i, j, k, l;
+			for(k = 0 ; k < last ; k++) {
+				if(data[k] > max) max = data[k];
+			}
+
+			for(exp = 1 ; max/exp > 0 ; exp *= 10) {
+				a = b = c = d = e = f = g = h = i = j = l = 0;
+				for(k = 0 ; k < last ; k++) {
+					mod = (data[k] / exp) % 10;
+					if(mod == 0) q0[a++] = data[k];
+					else if(mod == 1) q1[b++] = data[k];
+					else if(mod == 2) q2[c++] = data[k];
+					else if(mod == 3) q3[d++] = data[k];
+					else if(mod == 4) q4[e++] = data[k];
+					else if(mod == 5) q5[f++] = data[k];
+					else if(mod == 6) q6[g++] = data[k];
+					else if(mod == 7) q7[h++] = data[k];
+					else if(mod == 8) q8[i++] = data[k];
+					else if(mod == 9) q9[j++] = data[k];
+				}
+				for(k = 0 ; k < a ; k++)
+					data[k] = q0[k];
+				l = a;
+				for(k = 0 ; k < b ; k++)
+					data[l + k] = q1[k];
+				l = a + b;
+				for(k = 0 ; k < c ; k++)
+					data[l + k] = q2[k];
+				l = a + b + c;
+				for(k = 0 ; k < d ; k++)
+					data[l + k] = q3[k];
+				l = a + b + c + d;
+				for(k = 0 ; k < e ; k++)
+					data[l + k] = q4[k];
+				l = a + b + c + d + e;
+				for(k = 0 ; k < f ; k++)
+					data[l + k] = q5[k];
+				l = a + b + c + d + e + f;
+				for(k = 0 ; k < g ; k++)
+					data[l + k] = q6[k];
+				l = a + b + c + d + e + f + g;
+				for(k = 0 ; k < h ; k++)
+					data[l + k] = q7[k];
+				l = a + b + c + d + e + f + g + h;
+				for(k = 0 ; k < i ; k++)
+					data[l + k] = q8[k];
+				l = a + b + c + d + e + f + g + h + i;
+				for(k = 0 ; k < j ; k++)
+					data[l + k] = q9[k];
+			}
+		}
 };
 
 int main()
@@ -282,7 +338,7 @@ int main()
 	cout << "q : quit, i : insert data" << endl;
 	cout << "1 : selectionsort, 2 : insertionsort, 3 : bubblesort" << endl;
 	cout << "4 : combsort, 5 : shellsort, 6 : heapsort" << endl;
-	cout << "7 : quicksort, 8 : mergesort" << endl;
+	cout << "7 : quicksort, 8 : mergesort, 9 : radixsort" << endl;
 	c = getchar();
 	while(c != 'q') {
 		if(c == 'i') {
@@ -300,10 +356,12 @@ int main()
 			xsort.Xshellsort();
 		} else if(c == '6') {
 			xsort.Xheapsort();
-		} else if(c == '7') {
+		} else if(c == '7') { /* quick sort uses recurrence */
 			xsort.Xquicksort(xsort.data, xsort.last);
-		} else if(c == '8') {
+		} else if(c == '8') { /* merge sort uses recurrence */
 			xsort.Xmergesort(xsort.data, xsort.last);
+		} else if(c == '9') {
+			xsort.Xradixsort();
 		}
 		c = getchar();
 	}
