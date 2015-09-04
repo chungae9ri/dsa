@@ -242,9 +242,8 @@ template <typename T> class Xsort{
 			free(x);
 		}
 
-		/* let's assume data type is integer */
+		/* using count sort */
 		void Xradixsort() {
-#if 1
 			int exp, mod, max = 0;
 			int count[10] = {0,};
 			T out[last];
@@ -272,8 +271,10 @@ template <typename T> class Xsort{
 					data[i] = out[i];
 				}
 			}
+		}
 
-#else
+			/* using queue */
+		void XradixsortQ() {
 			int exp, mod, max = 0;
 			/* queue for saving data of each mod */
 			int q0[last], q1[last], q2[last], q3[last], q4[last];
@@ -328,7 +329,6 @@ template <typename T> class Xsort{
 				for(k = 0 ; k < j ; k++)
 					data[l + k] = q9[k];
 			}
-#endif
 		}
 };
 
@@ -369,7 +369,7 @@ int main()
 	cout << "q : quit, i : insert data" << endl;
 	cout << "1 : selectionsort, 2 : insertionsort, 3 : bubblesort" << endl;
 	cout << "4 : combsort, 5 : shellsort, 6 : heapsort" << endl;
-	cout << "7 : quicksort, 8 : mergesort, 9 : radixsort" << endl;
+	cout << "7 : quicksort, 8 : mergesort, 9 : radixsort, a : radixsort Q" << endl;
 	c = getchar();
 	while(c != 'q') {
 		if(c == 'i') {
@@ -393,6 +393,8 @@ int main()
 			xsort.Xmergesort(xsort.data, xsort.last);
 		} else if(c == '9') {
 			xsort.Xradixsort();
+		} else if(c == 'a') {
+			xsort.XradixsortQ();
 		}
 		c = getchar();
 	}
