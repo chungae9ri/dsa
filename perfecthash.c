@@ -160,5 +160,7 @@ int main()
 
 	perfecthash(pin);
 
+	free(pin);
+
 	return 0;
 }

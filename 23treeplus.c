@@ -239,4 +239,5 @@ int main()
 			xinsert(&root, key);
 		}
 		c = getchar();
-	}}
+	}
+}

@@ -9,7 +9,7 @@
 #include <time.h>
 
 using namespace std;
-#define LEN	1024	
+#define LEN	5000	
 #define SWAP(t, A, B) { t temp = A; A = B; B = temp; }
 
 template <typename T> class heap {
@@ -67,6 +67,9 @@ template <typename T> class heap {
 				i = lc;
 				lc = 2*i + 1;
 				rc = lc + 1;
+				if(lc == stop) {
+					if(ph[lc] > ph[i]) xswap(ph[lc], ph[i]);
+				}
 				if(lc >= stop) break;
 
 			} else if(ph[lc] <= ph[rc] && ph[rc] > ph[i]) {
@@ -74,6 +77,9 @@ template <typename T> class heap {
 				i = rc;
 				lc = 2*i + 1;
 				rc = lc + 1;
+				if(lc == stop) {
+					if(ph[lc] > ph[i]) xswap(ph[lc], ph[i]);
+				}
 				if(lc >= stop) break;
 			}
 		}

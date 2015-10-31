@@ -4,7 +4,7 @@ g++/gcc -g a.c
 commands
 1. gdb a.out : debugging start
 2. b(reak) main, b line#, b srcfile:line#, b +offset/-offset, b *address
-   : break main, 
+   : break main, b insert if expr : break insert if expr is true
 3. r(un) : run now
 4. s : go one step, step into func
 5. n : step over function, 
