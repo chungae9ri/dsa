@@ -289,7 +289,6 @@ template<typename T> class VertexArr {
 		Vertex<T> *pVertex;
 		VertexArr() { }
 		~VertexArr() {
-			cout << "~VertexArr() " << endl;
 			if(pVertex) delete[] pVertex;
 			pVertex = NULL;
 		}
@@ -369,6 +368,65 @@ template<typename T> class Graph {
 
 		VertexArr<T>& getVertexArr() {
 			return Varr;
+		}
+
+		void editEdge4Test(int v, int w, int idx, int wt) {
+			if(Varr.getVertex(v).editEdge(idx, w, wt)) {
+				if(Varr.getVertex(w).editEdge(idx, v, wt))
+					/*cout << "edited vertex : " << v << ", " << w << endl;*/
+					return;
+				else cout << "edit fail1, vertex " << v << ", " << w << endl;
+			} else cout << "edit fail2, vertex " << v << ", " << w << endl;
+		}
+
+		void makeTestPath() {
+			editEdge4Test(0, 203, 2, WEIGHTRANGE+1);
+			editEdge4Test(203, 2043, 5, WEIGHTRANGE+1);
+			editEdge4Test(2043, 1837, 0, WEIGHTRANGE+1);
+			editEdge4Test(1837, 396, 1, WEIGHTRANGE+1);
+			editEdge4Test(396, 4930, 2, WEIGHTRANGE+1);
+			editEdge4Test(4930, 1912, 5, WEIGHTRANGE+1);
+			editEdge4Test(1912, 882, 4, WEIGHTRANGE+1);
+			editEdge4Test(882, 549, 2, WEIGHTRANGE+1);
+			editEdge4Test(549, 2943, 4, WEIGHTRANGE+1);
+			editEdge4Test(2943, 3367, 2, WEIGHTRANGE+1);
+			editEdge4Test(3367, 2939, 2, WEIGHTRANGE+1);
+			editEdge4Test(2939, 4102, 2, WEIGHTRANGE+1);
+			editEdge4Test(4102, 88, 3, WEIGHTRANGE+1);
+			editEdge4Test(88, 2733, 3, WEIGHTRANGE+1);
+			editEdge4Test(2733, 1023, 5, WEIGHTRANGE+1);
+			editEdge4Test(1023, 923, 0, WEIGHTRANGE+1);
+			editEdge4Test(923, 102, 3, WEIGHTRANGE+1);
+			editEdge4Test(102, 485, 3, WEIGHTRANGE+1);
+			editEdge4Test(485, 775, 3, WEIGHTRANGE+1);
+			editEdge4Test(775, 120, 3, WEIGHTRANGE+1);
+			editEdge4Test(120, 1, 5, WEIGHTRANGE+1);
+			editEdge4Test(1, 4020, 3, WEIGHTRANGE+1);
+			editEdge4Test(4020,104, 3, WEIGHTRANGE+1);
+			editEdge4Test(104, 4922, 3, WEIGHTRANGE+1);
+			editEdge4Test(4922, 738, 3, WEIGHTRANGE+1);
+			editEdge4Test(738, 1238, 5, WEIGHTRANGE+1);
+			editEdge4Test(1238, 22, 1, WEIGHTRANGE+1);
+			editEdge4Test(22, 229, 5, WEIGHTRANGE+1);
+			editEdge4Test(229, 3499, 2, WEIGHTRANGE+1);
+			editEdge4Test(3499, 12, 4, WEIGHTRANGE+1);
+			editEdge4Test(12, 888, 1, WEIGHTRANGE+1);
+			editEdge4Test(888, 472, 1, WEIGHTRANGE+1);
+			editEdge4Test(472, 2398, 2, WEIGHTRANGE+1);
+			editEdge4Test(2398, 402, 3, WEIGHTRANGE+1);
+			editEdge4Test(402, 1112, 3, WEIGHTRANGE+1);
+			editEdge4Test(1112, 3981, 3, WEIGHTRANGE+1);
+			editEdge4Test(3981, 2391, 2, WEIGHTRANGE+1);
+			editEdge4Test(2391, 4392, 2, WEIGHTRANGE+1);
+			editEdge4Test(4392, 4422, 3, WEIGHTRANGE+1);
+			editEdge4Test(4422, 4, 3, WEIGHTRANGE+1);
+			editEdge4Test(4, 2299, 1, WEIGHTRANGE+1);
+			editEdge4Test(2299, 32, 5, WEIGHTRANGE+1);
+			editEdge4Test(32, 390, 5, WEIGHTRANGE+1);
+			editEdge4Test(390, 1212, 5, WEIGHTRANGE+1);
+			editEdge4Test(1212, 4022, 3, WEIGHTRANGE+1);
+			editEdge4Test(4022, 1024, 3, WEIGHTRANGE+1);
+
 		}
 
 		void genGraph() {
@@ -802,6 +860,10 @@ template<typename T> class Dijkstra {
 			} else cout << "edit fail2, vertex " << v << ", " << w << endl;
 		}
 
+		void makeTestPath() {
+			g.makeTestPath();
+		}
+
 		void findShortestPathwithHeap() {
 			int i, v, w, max = 0, min, cap, wt;
 			Edge<T> *pe;
@@ -1019,13 +1081,8 @@ template<typename T> class Kruskal {
 			this.Target = t;
 		}
 
-		void editEdge4Test(int v, int w, int idx, int wt) {
-			if(g.getVertexArr().getVertex(v).editEdge(idx, w, wt)) {
-				if(g.getVertexArr().getVertex(w).editEdge(idx, v, wt))
-					/*cout << "edited vertex : " << v << ", " << w << endl;*/
-					return;
-				else cout << "edit fail1, vertex " << v << ", " << w << endl;
-			} else cout << "edit fail2, vertex " << v << ", " << w << endl;
+		void makeTestPath() {
+			g.makeTestPath();
 		}
 
 		void findShortestPathKruskal() {
