@@ -426,7 +426,6 @@ template<typename T> class Graph {
 			editEdge4Test(390, 1212, 5, WEIGHTRANGE+1);
 			editEdge4Test(1212, 4022, 3, WEIGHTRANGE+1);
 			editEdge4Test(4022, 1024, 3, WEIGHTRANGE+1);
-
 		}
 
 		void genGraph() {
@@ -485,13 +484,12 @@ template<typename T> class Graph {
 			}
 			end = clock();
 			cout << "graph generation end" << endl;
-			cout << "graph generation takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
+			cout << "graph generation takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 		}
 
 		bool chkGraph() {
 			int i, j;
 			Edge<T> *pe;
-			cout << "check graph start !! " << endl;
 			/* check if the generated graph is correct or not 
 			   for each vertex do
 			   check the edge is correct.
@@ -503,10 +501,10 @@ template<typename T> class Graph {
 					pe2 = pe->next;
 					while(pe2) {
 						if((pe->v == pe2->v && pe->w == pe2->w)||(pe->w == pe2->v && pe->v == pe2->w)) {
-							cout << "there is repeated edge " << endl;
+							cout << "check graph : there is repeated edge " << endl;
 							if(pe->getWt() > pe2->getWt()) pe2->setWt(pe->getWt());
 							else pe->setWt(pe2->getWt());
-							return true;
+							return false;
 						}
 						pe2 = pe2->next;
 
@@ -514,15 +512,16 @@ template<typename T> class Graph {
 					pe = pe->next;
 				}
 			}
-			cout << "graph is good" << endl;
-			cout << "graph check end" << endl;
+			cout << "check graph : graph is good" << endl;
 			return true;
 		}
 
+		/* connect all vertices with small weight */
 		void connectAllVertices() {
 			int i;
 			for(i=0 ; i<VertexNum-1 ; i++) {
 				if(!Varr.getVertex(i).editEdge(0, i+1, (int)(WEIGHTRANGE/100))) {
+				/*if(!Varr.getVertex(i).editEdge(0, i+1, WEIGHTRANGE+1)) {*/
 					cout << "connect all vertices fail !!" << endl;
 					return;
 				}
@@ -933,7 +932,7 @@ template<typename T> class Dijkstra {
 			end = clock();
 
 			/*cout << "dijkstra w/ heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;*/
-			cout << "dijkstra w/ heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
+			cout << "dijkstra with heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
 			i = g.getVertexArr().getVertex(g.Target).getDad();
 			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
@@ -1035,7 +1034,7 @@ template<typename T> class Dijkstra {
 			}
 
 			end = clock();
-			cout << "dijkstra w/o heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
+			cout << "dijkstra w/o heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
 			i = g.getVertexArr().getVertex(g.Target).getDad();
 			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
@@ -1097,7 +1096,7 @@ template<typename T> class Kruskal {
 			Earr.genEdgeArr(g);
 			end = clock();
 
-			cout << "kruskal making edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
+			cout << "kruskal making edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
 			start = clock();
 			/* heap sort*/
@@ -1113,7 +1112,7 @@ template<typename T> class Kruskal {
 			}
 			end = clock();
 
-			cout << "kruskal heap sorting edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
+			cout << "kruskal heap sorting edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 			/* check heap sort */
 			for(i=0 ; i<Earr.getSize()-1; i++) {
 				if(pMaxEdgeArr[i] < pMaxEdgeArr[i+1]) {
@@ -1148,12 +1147,12 @@ template<typename T> class Kruskal {
 				}
 			}
 			end = clock();
-			cout << "kruskal building MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
+			cout << "kruskal building MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
 			start = clock();
 			DFS(g.Source);
 			end = clock();
-			cout << "kruskal finding path in MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
+			cout << "kruskal finding path in MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
 			i = g.getVertexArr().getVertex(g.Target).getDad();
 			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;

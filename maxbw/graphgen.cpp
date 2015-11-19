@@ -11,8 +11,6 @@ using namespace std;
 int main()
 {
 	int vn, en, ss, tt;
-	float vtxst, wtst;
-	Edge<int> *pe, *pe2;
 	Graph<int> g;
 
 	cout << "input Vertex number : " << endl;
@@ -26,6 +24,7 @@ int main()
 
 	g.initGraph(vn, en, ss, tt);
 	g.genGraph();
+	g.chkGraph();
 
 	return 0;
 }
