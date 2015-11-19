@@ -1,15 +1,12 @@
 #include <iostream>
-#include <stdio.h>
 #include "MyClasses.h"
 
 using namespace std;
 
 int main()
 {
-	/* source, target, vertex number, edge number */
-
-#if 1
 	int s, t, vn, en; 
+	/*
 	cout << "input vertex number : " << endl;
 	cin >> vn;
 	cout << "input edge number : " << endl;
@@ -18,12 +15,16 @@ int main()
 	cin >> s;
 	cout << "input target idx : " << endl;
 	cin >> t;
-	Dijkstra<int> dij(vn, en, s, t);
-#else
-	Dijkstra<int> dij(5000, 100, 0, 1024);
-#endif
+	*/
 
-	/*dij.chkGraph();*/
+	s=0; t=1024; vn=5000;en=6;
+	Graph<int> g;
+	g.initGraph(vn, en, s, t);
+	g.genGraph();
+	g.connectAllVertices();
+	/*Dijkstra<int> dij(g);*/
+	//
+	/*
 	dij.editEdge4Test(0, 203, 2, WEIGHTRANGE+1);
 	dij.editEdge4Test(203, 2043, 5, WEIGHTRANGE+1);
 	dij.editEdge4Test(2043, 1837, 0, WEIGHTRANGE+1);
@@ -48,25 +49,18 @@ int main()
 	dij.editEdge4Test(120, 1, 5, WEIGHTRANGE+1);
 	dij.editEdge4Test(1, 4022, 3, WEIGHTRANGE+1);
 	dij.editEdge4Test(4022, 1024, 3, WEIGHTRANGE+1);
-	
-#if 1	
+	*/
+	//
+
 	cout << "find shortest path : Dijkstra" << endl;
-	dij.findShortestPath();
+	/*dij.findShortestPath();*/
 	cout << "------------------------------" << endl;
 	cout << "find shortest path : Dijkstra with Heap" << endl;
-	dij.findShortestPathwithHeap();
+	/*dij.findShortestPathwithHeap();*/
+	cout << "------------------------------" << endl;
+	cout << "find shortest path : Kruskal" << endl;
+	Kruskal<int> ksl(g);
+	/*ksl.findShortestPathKruskal();*/
 
-#else
-	if(dij.chkGraph()) {
-		cout << "graph is correct " << endl;
-		dij.findShortestPath();
-		cout << "------------------------------" << endl;
-		dij.findShortestPathwithHeap();
-	} else {
-		cout << "graph is not correct !!" << endl;
-		return 0;
-	}
-#endif
-	
 	return 0;
 }

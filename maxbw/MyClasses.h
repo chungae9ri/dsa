@@ -7,7 +7,7 @@ using namespace std;
 /*#define VERTEXNUM	5000	*/
 /*#define EDGENUM		6*/
 
-#define RETRYCNT	100
+#define RETRYCNT	50
 #define WEIGHTRANGE	5000	
 #define UNSEEN 		0x1
 #define FRINGE		0x10
@@ -15,6 +15,7 @@ using namespace std;
 #define WHITE		255
 #define GRAY		128
 #define BLACK		0
+#define INFINITE	1000000
 
 template <typename T> class Vertex ;
 
@@ -219,7 +220,7 @@ template <typename T> class Vertex {
 		}
 
 		/* edit Edge to test the path */
-		bool editEdge(int w, int idx, int wt) {
+		bool editEdge(int idx, int w, int wt) {
 			int i;
 			Edge<T> *pe = Head;
 			if(idx >= EdgeNum) {
@@ -288,6 +289,7 @@ template<typename T> class VertexArr {
 		Vertex<T> *pVertex;
 		VertexArr() { }
 		~VertexArr() {
+			cout << "~VertexArr() " << endl;
 			if(pVertex) delete[] pVertex;
 			pVertex = NULL;
 		}
@@ -457,6 +459,18 @@ template<typename T> class Graph {
 			cout << "graph is good" << endl;
 			cout << "graph check end" << endl;
 			return true;
+		}
+
+		void connectAllVertices() {
+			int i;
+			for(i=0 ; i<VertexNum-1 ; i++) {
+				if(!Varr.getVertex(i).editEdge(0, i+1, (int)(WEIGHTRANGE/100))) {
+					cout << "connect all vertices fail !!" << endl;
+					return;
+				}
+			}
+
+			cout << "all vertices are connected. " << endl;
 		}
 };
 
@@ -755,13 +769,17 @@ template<typename T> class EdgeArr {
 template<typename T> class Dijkstra {
 	public: 
 		Graph<T> g;
-		int VertexNum, EdgeNum, Source, Target;
+		/*int VertexNum, EdgeNum, Source, Target;*/
 		Vertex<T> *ShortestPath;
 		clock_t start, end;
 
-		Dijkstra(int vn, int en, int ss, int tt):VertexNum(vn),EdgeNum(en),Source(ss),Target(tt) {
+		Dijkstra(Graph<T>& gref) {
+			g = gref;
+		}
+		Dijkstra(int vn, int en, int ss, int tt) {
 			g.initGraph(vn, en, ss, tt);
 			g.genGraph();
+			g.connectAllVertices();
 		}
 
 		/*
@@ -776,8 +794,8 @@ template<typename T> class Dijkstra {
 		}
 
 		void editEdge4Test(int v, int w, int idx, int wt) {
-			if(g.getVertexArr().getVertex(v).editEdge(w, idx, wt)) {
-				if(g.getVertexArr().getVertex(w).editEdge(v, idx, wt))
+			if(g.getVertexArr().getVertex(v).editEdge(idx, w, wt)) {
+				if(g.getVertexArr().getVertex(w).editEdge(idx,v, wt))
 					/*cout << "edited vertex : " << v << ", " << w << endl;*/
 					return;
 				else cout << "edit fail1, vertex " << v << ", " << w << endl;
@@ -788,29 +806,29 @@ template<typename T> class Dijkstra {
 			int i, v, w, max = 0, min, cap, wt;
 			Edge<T> *pe;
 			Vertex<T> refv;
-			Heap< Vertex<T> > H(VertexNum);
+			Heap< Vertex<T> > H(g.VertexNum);
 
 			start = clock();
 
-			for(i=0 ; i<VertexNum ; i++) {
+			for(i=0 ; i<g.VertexNum ; i++) {
 				g.getVertexArr().getVertex(i).setStatus(UNSEEN);
 				g.getVertexArr().getVertex(i).setCap(0);
 				g.getVertexArr().getVertex(i).setDad(-1);
 			}
 
 			/* set source INTREE */
-			g.getVertexArr().getVertex(Source).setStatus(INTREE);
+			g.getVertexArr().getVertex(g.Source).setStatus(INTREE);
 			/* set source neighbor as FRINGE */
-			pe = g.getVertexArr().getVertex(Source).getHead();
+			pe = g.getVertexArr().getVertex(g.Source).getHead();
 			while(pe) {
 				g.getVertexArr().getVertex(pe->w).setStatus(FRINGE);
-				g.getVertexArr().getVertex(pe->w).setDad(Source);
+				g.getVertexArr().getVertex(pe->w).setDad(g.Source);
 				g.getVertexArr().getVertex(pe->w).setCap(pe->getWt());
 				H.xInsert(g.getVertexArr().getVertex(pe->w));
 				pe = pe->next;
 			}
 
-			while(g.getVertexArr().getVertex(Target).getStatus() != INTREE) {
+			while(g.getVertexArr().getVertex(g.Target).getStatus() != INTREE) {
 				refv = H.xMaximum();
 				v = refv.getIdx();
 				/* temp for debugging purpose */
@@ -855,13 +873,13 @@ template<typename T> class Dijkstra {
 			/*cout << "dijkstra w/ heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;*/
 			cout << "dijkstra w/ heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
 
-			i = g.getVertexArr().getVertex(Target).getDad();
-			cout << "target : " << Target << " cap : " << g.getVertexArr().getVertex(Target).getCap() << endl;
-			while(i != Source) {
+			i = g.getVertexArr().getVertex(g.Target).getDad();
+			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
+			while(i != g.Source) {
 				cout << "-> Dad : " << i << endl;
 				i = g.getVertexArr().getVertex(i).getDad();
 			}
-			cout << "-> source : " << Source << endl;
+			cout << "-> source : " << g.Source << endl;
 
 			if(checkPath()) cout << "check Path : correct path !!" << endl;
 			else cout << "check Path : not correct !!" << endl;
@@ -870,9 +888,9 @@ template<typename T> class Dijkstra {
 		bool checkPath() {
 			int v, w ;
 			Edge<T> *pe;
-			v = g.getVertexArr().getVertex(Target).getDad();
-			w = Target;
-			while(v != Source) {
+			v = g.getVertexArr().getVertex(g.Target).getDad();
+			w = g.Target;
+			while(v != g.Source) {
 				pe = g.getVertexArr().getVertex(v).Head;
 				while(pe != NULL) {
 					if((pe->v == v && pe->w == w) || (pe->v == w && pe->w==v))
@@ -901,28 +919,28 @@ template<typename T> class Dijkstra {
 
 			start = clock();
 
-			for(i=0 ; i<VertexNum ; i++) {
+			for(i=0 ; i<g.VertexNum ; i++) {
 				g.getVertexArr().getVertex(i).setStatus(UNSEEN);
 				g.getVertexArr().getVertex(i).setCap(0);
 				g.getVertexArr().getVertex(i).setDad(-1);
 			}
 
 			/* set source INTREE */
-			g.getVertexArr().getVertex(Source).setStatus(INTREE);
+			g.getVertexArr().getVertex(g.Source).setStatus(INTREE);
 			/* set source neight as FRINGE */
-			pe = g.getVertexArr().getVertex(Source).getHead();
+			pe = g.getVertexArr().getVertex(g.Source).getHead();
 			while(pe) {
 				g.getVertexArr().getVertex(pe->w).setStatus(FRINGE);
-				g.getVertexArr().getVertex(pe->w).setDad(Source);
+				g.getVertexArr().getVertex(pe->w).setDad(g.Source);
 				g.getVertexArr().getVertex(pe->w).setCap(pe->getWt());
 				pe = pe->next;
 			}
 
-			while(g.getVertexArr().getVertex(Target).getStatus() != INTREE) {
+			while(g.getVertexArr().getVertex(g.Target).getStatus() != INTREE) {
 				max = 0; 
 				v = -1;
 				/* pick the vertex with largest BW in FRINGE */
-				for(i=0 ; i<VertexNum ; i++) {
+				for(i=0 ; i<g.VertexNum ; i++) {
 					if(g.getVertexArr().getVertex(i).getStatus() == FRINGE) {
 						if(g.getVertexArr().getVertex(i).getCap() > max) {
 							max = g.getVertexArr().getVertex(i).getCap();
@@ -957,13 +975,13 @@ template<typename T> class Dijkstra {
 			end = clock();
 			cout << "dijkstra w/o heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
 
-			i = g.getVertexArr().getVertex(Target).getDad();
-			cout << "target : " << Target << " cap : " << g.getVertexArr().getVertex(Target).getCap() << endl;
-			while(i != Source) {
+			i = g.getVertexArr().getVertex(g.Target).getDad();
+			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
+			while(i != g.Source) {
 				cout << "-> Dad : " << i << endl;
 				i = g.getVertexArr().getVertex(i).getDad();
 			}
-			cout << "-> source : " << Source << endl;
+			cout << "-> source : " << g.Source << endl;
 			if(checkPath()) cout << "check Path : correct path !!" << endl;
 			else cout << "check Path : not correct !!" << endl;
 		}
@@ -976,13 +994,18 @@ template<typename T> class Kruskal {
 		Edge<T> *pMSTHead;
 		clock_t start, end;
 
-		int VertexNum, EdgeNum, Source, Target;
+		/*int VertexNum, EdgeNum, Source, Target;*/
 		Vertex<T> *ShortestPath;
 
-		Kruskal(int vn, int en, int ss, int tt):VertexNum(vn),EdgeNum(en),Source(ss),Target(tt) {
+		Kruskal(Graph<T>& gref) {
+			g = gref;
+		}
+
+		Kruskal(int vn, int en, int ss, int tt) {
 			pMSTHead = NULL;
 			g.initGraph(vn, en, ss, tt);
 			g.genGraph();
+			g.connectAllVertices();
 		}
 
 		/*
@@ -997,8 +1020,8 @@ template<typename T> class Kruskal {
 		}
 
 		void editEdge4Test(int v, int w, int idx, int wt) {
-			if(g.getVertexArr().getVertex(v).editEdge(w, idx, wt)) {
-				if(g.getVertexArr().getVertex(w).editEdge(v, idx, wt))
+			if(g.getVertexArr().getVertex(v).editEdge(idx, w, wt)) {
+				if(g.getVertexArr().getVertex(w).editEdge(idx, v, wt))
 					/*cout << "edited vertex : " << v << ", " << w << endl;*/
 					return;
 				else cout << "edit fail1, vertex " << v << ", " << w << endl;
@@ -1061,9 +1084,9 @@ template<typename T> class Kruskal {
 					g.Varr.unionSet(s1, s2);
 					/*cout << "v : " << v << ", w: " << w << endl;*/
 				}
-				if(g.Varr.findSet(g.Varr.getVertex(Source)) 
-					== g.Varr.findSet(g.Varr.getVertex(Target))) {
-					cout << "found !! " << endl;
+				if(g.Varr.findSet(g.Varr.getVertex(g.Source)) 
+					== g.Varr.findSet(g.Varr.getVertex(g.Target))) {
+					/*cout << "found !! " << endl;*/
 					break;
 				}
 			}
@@ -1071,17 +1094,17 @@ template<typename T> class Kruskal {
 			cout << "kruskal building MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
 
 			start = clock();
-			DFS(Source);
+			DFS(g.Source);
 			end = clock();
 			cout << "kruskal finding path in MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;
 
-			i = g.getVertexArr().getVertex(Target).getDad();
-			cout << "target : " << Target << " cap : " << g.getVertexArr().getVertex(Target).getCap() << endl;
-			while(i != Source) {
+			i = g.getVertexArr().getVertex(g.Target).getDad();
+			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
+			while(i != g.Source) {
 				cout << "-> Dad : " << i << endl;
 				i = g.getVertexArr().getVertex(i).getDad();
 			}
-			cout << "-> source : " << Source << endl;
+			cout << "-> source : " << g.Source << endl;
 
 
 			/*
@@ -1099,8 +1122,8 @@ template<typename T> class Kruskal {
 			int cap, wt, min;
 			Edge<T> *pe;
 
-			if(v == Source) g.getVertexArr().getVertex(Source).setCap(1000000);
-			if(v == Target) return;
+			if(v == g.Source) g.getVertexArr().getVertex(g.Source).setCap(INFINITE);
+			if(v == g.Target) return;
 
 			pe = pMSTHead;
 			g.getVertexArr().getVertex(v).setColor(GRAY);

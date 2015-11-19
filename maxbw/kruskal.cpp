@@ -19,7 +19,6 @@ int main()
 	Kruskal<int> ksl(vn, en, s, t);
 #else
 	Kruskal<int> ksl(5000, 10, 0, 1024);
-#endif
 
 	ksl.editEdge4Test(0, 203, 2, WEIGHTRANGE+1);
 	ksl.editEdge4Test(203, 2043, 5, WEIGHTRANGE+1);
@@ -46,6 +45,7 @@ int main()
 	ksl.editEdge4Test(1, 4022, 3, WEIGHTRANGE+1);
 	ksl.editEdge4Test(4022, 1024, 3, WEIGHTRANGE+1);
 	
+#endif
 	ksl.findShortestPathKruskal();
 
 	return 0;
