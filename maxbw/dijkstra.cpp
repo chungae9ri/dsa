@@ -28,17 +28,17 @@ int main()
 
 #if 1	
 	cout << "find shortest path : Dijkstra" << endl;
-	dij.findShortestPath();
+	dij.findMaxBWPath();
 	cout << "------------------------------" << endl;
 	cout << "find shortest path : Dijkstra with Heap" << endl;
-	dij.findShortestPathwithHeap();
+	dij.findMaxBWPathHeap();
 
 #else
 	if(dij.chkGraph()) {
 		cout << "graph is correct " << endl;
-		dij.findShortestPath();
+		dij.findMaxBandwidth();
 		cout << "------------------------------" << endl;
-		dij.findShortestPathwithHeap();
+		dij.findMaxBandwidthwithHeap();
 	} else {
 		cout << "graph is not correct !!" << endl;
 		return 0;

@@ -23,7 +23,7 @@ int main()
 	ksl.makeTestPath();
 	
 #endif
-	ksl.findShortestPathKruskal();
+	ksl.findMaxBWPathKruskal();
 
 	return 0;
 }

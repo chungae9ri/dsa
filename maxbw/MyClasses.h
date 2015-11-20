@@ -848,8 +848,6 @@ template <typename T> class Heap {
 template<typename T> class Dijkstra {
 	public: 
 		Graph<T> g;
-		/*int VertexNum, EdgeNum, Source, Target;*/
-		Vertex<T> *ShortestPath;
 		clock_t start, end;
 
 		Dijkstra(Graph<T>& gref) {
@@ -872,20 +870,11 @@ template<typename T> class Dijkstra {
 			this.Target = t;
 		}
 
-		void editEdge4Test(int v, int w, int idx, int wt) {
-			if(g.getVertexArr().getVertex(v).editEdge(idx, w, wt)) {
-				if(g.getVertexArr().getVertex(w).editEdge(idx,v, wt))
-					/*cout << "edited vertex : " << v << ", " << w << endl;*/
-					return;
-				else cout << "edit fail1, vertex " << v << ", " << w << endl;
-			} else cout << "edit fail2, vertex " << v << ", " << w << endl;
-		}
-
 		void makeTestPath() {
 			g.makeTestPath();
 		}
 
-		void findShortestPathwithHeap() {
+		void findMaxBWPathHeap() {
 			int i, v, w, max = 0, min, cap, wt;
 			Edge<T> *pe;
 			Vertex<T> refv;
@@ -996,7 +985,7 @@ template<typename T> class Dijkstra {
 			return true;
 		}
 
-		void findShortestPath() {
+		void findMaxBWPath() {
 			int i, v, w, max = 0, min, cap, wt;
 			Edge<T> *pe;
 
@@ -1077,9 +1066,6 @@ template<typename T> class Kruskal {
 		Edge<T> *pMSTHead;
 		clock_t start, end;
 
-		/*int VertexNum, EdgeNum, Source, Target;*/
-		Vertex<T> *ShortestPath;
-
 		Kruskal(Graph<T>& gref) {
 			g = gref;
 		}
@@ -1106,7 +1092,7 @@ template<typename T> class Kruskal {
 			g.makeTestPath();
 		}
 
-		void findShortestPathKruskal() {
+		void findMaxBWPathKruskal() {
 			int i, r, l;
 			int v, w;
 			int s1, s2;
