@@ -18,6 +18,8 @@ using namespace std;
 #define INFINITE	1000000
 
 template <typename T> class Vertex ;
+template <typename T> class Heap ;
+template<typename T> class Graph; 
 
 /* class edge of Graph */
 template <typename T> class Edge {
@@ -33,7 +35,11 @@ template <typename T> class Edge {
 		/* for Kruskal edge path */
 		Edge<T> *pMSTNext;
 
-		Edge() {} 
+		Edge() {
+			next = NULL;
+			prev = NULL;
+			pMSTNext = NULL;
+		} 
 		/* edge constructor which sets the begin, end vertices and weight */
 		Edge(int vv, int ww, T d):v(vv), w(ww), wt(d) {
 			/*cout << "edge const" << endl;*/
@@ -349,12 +355,57 @@ template<typename T> class VertexArr {
 		}
 };
 
+template<typename T> class EdgeArr {
+	public:
+		Heap< Edge<T> > H;
+
+		EdgeArr() { }
+		~EdgeArr() { }
+
+		void genEdgeArr(Graph<T>& g) {
+			int i, j, alreadyIn=0;
+			Edge<T> *pe;
+			H.mallocHeap(g.VertexNum);
+			for(i=0 ; i<g.VertexNum ; i++) {
+				pe = g.Varr.getVertex(i).Head;
+				while(pe) {
+					for(j=0 ; j<H.getLastIdx(); j++) {
+						if(H.ph[j] == *pe)
+						break;
+					}
+					if(j==H.getLastIdx()) {
+						H.xInsert(*pe);
+					}
+					pe = pe->next;
+				}
+			}
+		}
+
+		void genEdgeArr(int len) {
+			H.mallocHeap(len);
+		}
+
+		void insertEdge(Edge<T>& e) {
+			H.xInsert(e);
+		}
+
+		Edge<T>& getEdge(int i) {
+			return H.ph[i];
+		}
+
+		int getSize() {
+			return H.getLastIdx();
+		}
+};
+
+
 template<typename T> class Graph {
 	public : 
 		int VertexNum;
 		int EdgeNum;
 		int Source, Target;
 		VertexArr<T> Varr;
+		EdgeArr<T> Earr;
 		clock_t start, end;
 
 		Graph() { }
@@ -371,11 +422,15 @@ template<typename T> class Graph {
 		}
 
 		void editEdge4Test(int v, int w, int idx, int wt) {
+			Edge<T> e;
 			if(Varr.getVertex(v).editEdge(idx, w, wt)) {
-				if(Varr.getVertex(w).editEdge(idx, v, wt))
-					/*cout << "edited vertex : " << v << ", " << w << endl;*/
+				if(Varr.getVertex(w).editEdge(idx, v, wt)) {
+					e.v = v;
+					e.w = w;
+					e.setWt(wt);
+					Earr.insertEdge(e);
 					return;
-				else cout << "edit fail1, vertex " << v << ", " << w << endl;
+				} else cout << "edit fail1, vertex " << v << ", " << w << endl;
 			} else cout << "edit fail2, vertex " << v << ", " << w << endl;
 		}
 
@@ -437,6 +492,7 @@ template<typename T> class Graph {
 			cout << "graph generation start " << endl;
 			start = clock();
 			Varr.genVertexArr(VertexNum, EdgeNum);
+			Earr.genEdgeArr(VertexNum);
 			srand(time(NULL));
 			/* random number(vertex idx) used as 
 			   the neighbor of current vertex */
@@ -472,6 +528,7 @@ template<typename T> class Graph {
 						/* add same edge to both vertices */
 						Varr.getVertex(i).addEdge(pe);
 						Varr.getVertex(k).addEdge(pe2);
+						Earr.insertEdge(*pe);
 						j++;
 					} else {
 						/* if edge is already there, 
@@ -787,41 +844,6 @@ template <typename T> class Heap {
 		}
 };
 
-template<typename T> class EdgeArr {
-	public:
-		Heap< Edge<T> > H;
-
-		EdgeArr() { }
-		~EdgeArr() { }
-
-		void genEdgeArr(Graph<T>& g) {
-			int i, j, alreadyIn=0;
-			Edge<T> *pe;
-			H.mallocHeap(g.VertexNum);
-			for(i=0 ; i<g.VertexNum ; i++) {
-				pe = g.Varr.getVertex(i).Head;
-				while(pe) {
-					for(j=0 ; j<H.getLastIdx(); j++) {
-						if(H.ph[j] == *pe)
-						break;
-					}
-					if(j==H.getLastIdx()) {
-						H.xInsert(*pe);
-					}
-					pe = pe->next;
-				}
-			}
-		}
-
-		Edge<T>& getEdge(int i) {
-			return H.ph[i];
-		}
-
-		int getSize() {
-			return H.getLastIdx();
-		}
-};
-
 
 template<typename T> class Dijkstra {
 	public: 
@@ -836,7 +858,7 @@ template<typename T> class Dijkstra {
 		Dijkstra(int vn, int en, int ss, int tt) {
 			g.initGraph(vn, en, ss, tt);
 			g.genGraph();
-			g.connectAllVertices();
+			/*g.connectAllVertices();*/
 		}
 
 		/*
@@ -1051,7 +1073,7 @@ template<typename T> class Dijkstra {
 template<typename T> class Kruskal {
 	public:
 		Graph<T> g;
-		EdgeArr<T> Earr;
+		/*EdgeArr<T> Earr;*/
 		Edge<T> *pMSTHead;
 		clock_t start, end;
 
@@ -1066,7 +1088,7 @@ template<typename T> class Kruskal {
 			pMSTHead = NULL;
 			g.initGraph(vn, en, ss, tt);
 			g.genGraph();
-			g.connectAllVertices();
+			/*g.connectAllVertices();*/
 		}
 
 		/*
@@ -1091,30 +1113,33 @@ template<typename T> class Kruskal {
 			Edge<T> e;
 			Edge<T> *pe;
 			Edge<T> *pMaxEdgeArr;
+			/* should not use this. this takes O(n*m*m) */
 			/* genEdgeArr generate max heap */
+			/*
 			start = clock();
 			Earr.genEdgeArr(g);
 			end = clock();
 
 			cout << "kruskal making edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
+			*/
 
 			start = clock();
 			/* heap sort*/
-			for(i=Earr.getSize()-1 ; i>0 ; i--) {
-				Earr.H.xSwap(0, i);
-				Earr.H.xMovedown(0, i-1);
+			for(i=g.Earr.getSize()-1 ; i>0 ; i--) {
+				g.Earr.H.xSwap(0, i);
+				g.Earr.H.xMovedown(0, i-1);
 			}
 
 			/* reorder the heap sort with non-increasing order*/
-			pMaxEdgeArr = (Edge<T> *)malloc(sizeof(Edge<T>)*Earr.getSize());
-			for(i=0 ; i<Earr.getSize() ; i++) {
-				pMaxEdgeArr[i] = Earr.H.ph[Earr.getSize()-1-i];
+			pMaxEdgeArr = (Edge<T> *)malloc(sizeof(Edge<T>)*g.Earr.getSize());
+			for(i=0 ; i<g.Earr.getSize() ; i++) {
+				pMaxEdgeArr[i] = g.Earr.H.ph[g.Earr.getSize()-1-i];
 			}
 			end = clock();
 
 			cout << "kruskal heap sorting edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 			/* check heap sort */
-			for(i=0 ; i<Earr.getSize()-1; i++) {
+			for(i=0 ; i<g.Earr.getSize()-1; i++) {
 				if(pMaxEdgeArr[i] < pMaxEdgeArr[i+1]) {
 					cout << "Max heap sort fail !!" << endl;
 					break;
@@ -1127,8 +1152,8 @@ template<typename T> class Kruskal {
 
 			start = clock();
 			/* build MST */
-			for(i=0 ; i<Earr.getSize() ; i++) {
-				/*e = Earr.getEdge(i);*/
+			for(i=0 ; i<g.Earr.getSize() ; i++) {
+				/*e = g.Earr.getEdge(i);*/
 				pe = &pMaxEdgeArr[i];
 				v = pe->v;
 				w = pe->w;
@@ -1210,17 +1235,4 @@ template<typename T> class Kruskal {
 			g.Varr.getVertex(v).setColor(BLACK);
 		}
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
