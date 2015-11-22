@@ -433,53 +433,54 @@ template<typename T> class Graph {
 		}
 
 		void makeTestPath() {
+			/* donot use this. only for test purpose */
 #if 0
-			editEdge4Test(0, 203, 2, WEIGHTRANGE+1);
-			editEdge4Test(203, 2043, 5, WEIGHTRANGE+1);
+			editEdge4Test(0, 203, 0, WEIGHTRANGE+1);
+			editEdge4Test(203, 2043, 0, WEIGHTRANGE+1);
 			editEdge4Test(2043, 1837, 0, WEIGHTRANGE+1);
-			editEdge4Test(1837, 396, 1, WEIGHTRANGE+1);
-			editEdge4Test(396, 4930, 2, WEIGHTRANGE+1);
-			editEdge4Test(4930, 1912, 5, WEIGHTRANGE+1);
-			editEdge4Test(1912, 882, 4, WEIGHTRANGE+1);
-			editEdge4Test(882, 549, 2, WEIGHTRANGE+1);
-			editEdge4Test(549, 2943, 4, WEIGHTRANGE+1);
-			editEdge4Test(2943, 3367, 2, WEIGHTRANGE+1);
-			editEdge4Test(3367, 2939, 2, WEIGHTRANGE+1);
-			editEdge4Test(2939, 4102, 2, WEIGHTRANGE+1);
-			editEdge4Test(4102, 88, 3, WEIGHTRANGE+1);
-			editEdge4Test(88, 2733, 3, WEIGHTRANGE+1);
-			editEdge4Test(2733, 1023, 5, WEIGHTRANGE+1);
+			editEdge4Test(1837, 396, 0, WEIGHTRANGE+1);
+			editEdge4Test(396, 4930, 0, WEIGHTRANGE+1);
+			editEdge4Test(4930, 1912, 0, WEIGHTRANGE+1);
+			editEdge4Test(1912, 882, 0, WEIGHTRANGE+1);
+			editEdge4Test(882, 549, 0, WEIGHTRANGE+1);
+			editEdge4Test(549, 2943, 0, WEIGHTRANGE+1);
+			editEdge4Test(2943, 3367, 0, WEIGHTRANGE+1);
+			editEdge4Test(3367, 2939, 0, WEIGHTRANGE+1);
+			editEdge4Test(2939, 4102, 0, WEIGHTRANGE+1);
+			editEdge4Test(4102, 88, 0, WEIGHTRANGE+1);
+			editEdge4Test(88, 2733, 0, WEIGHTRANGE+1);
+			editEdge4Test(2733, 1023, 0, WEIGHTRANGE+1);
 			editEdge4Test(1023, 923, 0, WEIGHTRANGE+1);
-			editEdge4Test(923, 102, 3, WEIGHTRANGE+1);
-			editEdge4Test(102, 485, 3, WEIGHTRANGE+1);
-			editEdge4Test(485, 775, 3, WEIGHTRANGE+1);
-			editEdge4Test(775, 120, 3, WEIGHTRANGE+1);
-			editEdge4Test(120, 1, 5, WEIGHTRANGE+1);
-			editEdge4Test(1, 4020, 3, WEIGHTRANGE+1);
-			editEdge4Test(4020,104, 3, WEIGHTRANGE+1);
-			editEdge4Test(104, 4922, 3, WEIGHTRANGE+1);
-			editEdge4Test(4922, 738, 3, WEIGHTRANGE+1);
-			editEdge4Test(738, 1238, 5, WEIGHTRANGE+1);
-			editEdge4Test(1238, 22, 1, WEIGHTRANGE+1);
-			editEdge4Test(22, 229, 5, WEIGHTRANGE+1);
-			editEdge4Test(229, 3499, 2, WEIGHTRANGE+1);
-			editEdge4Test(3499, 12, 4, WEIGHTRANGE+1);
-			editEdge4Test(12, 888, 1, WEIGHTRANGE+1);
-			editEdge4Test(888, 472, 1, WEIGHTRANGE+1);
-			editEdge4Test(472, 2398, 2, WEIGHTRANGE+1);
-			editEdge4Test(2398, 402, 3, WEIGHTRANGE+1);
-			editEdge4Test(402, 1112, 3, WEIGHTRANGE+1);
-			editEdge4Test(1112, 3981, 3, WEIGHTRANGE+1);
-			editEdge4Test(3981, 2391, 2, WEIGHTRANGE+1);
-			editEdge4Test(2391, 4392, 2, WEIGHTRANGE+1);
-			editEdge4Test(4392, 4422, 3, WEIGHTRANGE+1);
-			editEdge4Test(4422, 4, 3, WEIGHTRANGE+1);
-			editEdge4Test(4, 2299, 1, WEIGHTRANGE+1);
-			editEdge4Test(2299, 32, 5, WEIGHTRANGE+1);
-			editEdge4Test(32, 390, 5, WEIGHTRANGE+1);
-			editEdge4Test(390, 1212, 5, WEIGHTRANGE+1);
-			editEdge4Test(1212, 4022, 3, WEIGHTRANGE+1);
-			editEdge4Test(4022, 1024, 3, WEIGHTRANGE+1);
+			editEdge4Test(923, 102, 0, WEIGHTRANGE+1);
+			editEdge4Test(102, 485, 0, WEIGHTRANGE+1);
+			editEdge4Test(485, 775, 0, WEIGHTRANGE+1);
+			editEdge4Test(775, 120, 0, WEIGHTRANGE+1);
+			editEdge4Test(120, 1, 0, WEIGHTRANGE+1);
+			editEdge4Test(1, 4020, 0, WEIGHTRANGE+1);
+			editEdge4Test(4020,104, 0, WEIGHTRANGE+1);
+			editEdge4Test(104, 4922, 0, WEIGHTRANGE+1);
+			editEdge4Test(4922, 738, 0, WEIGHTRANGE+1);
+			editEdge4Test(738, 1238, 0, WEIGHTRANGE+1);
+			editEdge4Test(1238, 22, 0, WEIGHTRANGE+1);
+			editEdge4Test(22, 229, 0, WEIGHTRANGE+1);
+			editEdge4Test(229, 3499, 0, WEIGHTRANGE+1);
+			editEdge4Test(3499, 12, 0, WEIGHTRANGE+1);
+			editEdge4Test(12, 888, 0, WEIGHTRANGE+1);
+			editEdge4Test(888, 472, 0, WEIGHTRANGE+1);
+			editEdge4Test(472, 2398, 0, WEIGHTRANGE+1);
+			editEdge4Test(2398, 402, 0, WEIGHTRANGE+1);
+			editEdge4Test(402, 1112, 0, WEIGHTRANGE+1);
+			editEdge4Test(1112, 3981, 0, WEIGHTRANGE+1);
+			editEdge4Test(3981, 2391, 0, WEIGHTRANGE+1);
+			editEdge4Test(2391, 4392, 0, WEIGHTRANGE+1);
+			editEdge4Test(4392, 4422, 0, WEIGHTRANGE+1);
+			editEdge4Test(4422, 4, 0, WEIGHTRANGE+1);
+			editEdge4Test(4, 2299, 0, WEIGHTRANGE+1);
+			editEdge4Test(2299, 32, 0, WEIGHTRANGE+1);
+			editEdge4Test(32, 390, 0, WEIGHTRANGE+1);
+			editEdge4Test(390, 1212, 0, WEIGHTRANGE+1);
+			editEdge4Test(1212, 4022, 0, WEIGHTRANGE+1);
+			editEdge4Test(4022, 1024, 0, WEIGHTRANGE+1);
 #endif
 		}
 
@@ -574,17 +575,22 @@ template<typename T> class Graph {
 		}
 
 		/* connect all vertices with small weight */
-		void connectAllVertices() {
+		bool connectAllVertices() {
 			int i;
-			for(i=0 ; i<VertexNum-1 ; i++) {
-				if(!Varr.getVertex(i).editEdge(0, i+1, (int)(WEIGHTRANGE/100))) {
+			for(i=0 ; i<VertexNum-2 ; i++) {
+				if(!Varr.getVertex(i).editEdge(0, i+1, (int)(WEIGHTRANGE/100)) ||
+						!Varr.getVertex(i+1).editEdge(0, i, (int)(WEIGHTRANGE/100))) {
 				/*if(!Varr.getVertex(i).editEdge(0, i+1, WEIGHTRANGE+1)) {*/
 					cout << "connect all vertices fail !!" << endl;
-					return;
+					return false;
 				}
 			}
-
+			for(i=0 ; i<VertexNum-2 ; i++) {
+				if(Varr.getVertex(i).getHead()->w != i+1)
+					return false;
+			}
 			cout << "all vertices are connected. " << endl;
+			return true;
 		}
 };
 
@@ -839,6 +845,7 @@ template <typename T> class Heap {
 
 template<typename T> class Dijkstra {
 	public: 
+		bool isAllConnected;
 		Vertex<T> refv;
 		Graph<T> g;
 		clock_t start, end;
@@ -850,7 +857,7 @@ template<typename T> class Dijkstra {
 		Dijkstra(int vn, int en) {
 			g.initGraph(vn, en);
 			g.genGraph();
-			g.connectAllVertices();
+			isAllConnected = g.connectAllVertices();
 		}
 
 		void makeTestPath() {
@@ -863,6 +870,11 @@ template<typename T> class Dijkstra {
 			Target = t;
 			Edge<T> *pe;
 			Heap< Vertex<T> > H(g.VertexNum);
+
+			if(!isAllConnected) {
+				cout << "Not all vertices are connected" << endl;
+				return;
+			}
 
 			start = clock();
 
@@ -975,6 +987,11 @@ template<typename T> class Dijkstra {
 			Target = t;
 			Edge<T> *pe;
 
+			if(!isAllConnected) {
+				cout << "Not all vertices are connected" << endl;
+				return;
+			}
+
 			start = clock();
 
 			for(i=0 ; i<g.VertexNum ; i++) {
@@ -1047,6 +1064,8 @@ template<typename T> class Dijkstra {
 
 template<typename T> class Kruskal {
 	public:
+		bool isHeapSortDone;
+		bool isAllConnected;
 		int Source, Target;
 		Graph<T> g;
 		/*EdgeArr<T> Earr;*/
@@ -1062,9 +1081,12 @@ template<typename T> class Kruskal {
 			pMSTHead = NULL;
 			g.initGraph(vn, en);
 			g.genGraph();
-			g.connectAllVertices();
+			isAllConnected = g.connectAllVertices();
+			pMaxEdgeArr = (Edge<T> *)malloc(sizeof(Edge<T>)*g.Earr.getSize());
+			isHeapSortDone = false;
 		}
 		~Kruskal() {
+			free(pMaxEdgeArr);
 		}
 
 		void makeTestPath() {
@@ -1076,6 +1098,10 @@ template<typename T> class Kruskal {
 			int v, w;
 			int s1, s2;
 
+			if(!isAllConnected) {
+				cout << "Not all vertices are connected" << endl;
+				return;
+			}
 			Source = s;
 			Target = t;
 			Edge<T> e;
@@ -1090,28 +1116,31 @@ template<typename T> class Kruskal {
 			cout << "kruskal making edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 			 */
 
-			start = clock();
-			/* heap sort*/
-			for(i=g.Earr.getSize()-1 ; i>0 ; i--) {
-				g.Earr.H.xSwap(0, i);
-				g.Earr.H.xMovedown(0, i-1);
-			}
+			if(!isHeapSortDone) {
+				isHeapSortDone = true;
+				start = clock();
+				/* heap sort*/
+				for(i=g.Earr.getSize()-1 ; i>0 ; i--) {
+					g.Earr.H.xSwap(0, i);
+					g.Earr.H.xMovedown(0, i-1);
+				}
 
-			pMaxEdgeArr = (Edge<T> *)malloc(sizeof(Edge<T>)*g.Earr.getSize());
-			/* reorder the heap sort with non-increasing order*/
-			for(i=0 ; i<g.Earr.getSize() ; i++) {
-				pMaxEdgeArr[i] = g.Earr.H.ph[g.Earr.getSize()-1-i];
-			}
-			end = clock();
+				/* reorder the heap sort with non-increasing order*/
+				for(i=0 ; i<g.Earr.getSize() ; i++) {
+					pMaxEdgeArr[i] = g.Earr.H.ph[g.Earr.getSize()-1-i];
+				}
+				end = clock();
 
-			cout << "kruskal heap sorting edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
-			/* check heap sort */
-			for(i=0 ; i<g.Earr.getSize()-1; i++) {
-				if(pMaxEdgeArr[i] < pMaxEdgeArr[i+1]) {
-					cout << "Max heap sort fail !!" << endl;
-					break;
+				cout << "kruskal heap sorting edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
+				/* check heap sort */
+				for(i=0 ; i<g.Earr.getSize()-1; i++) {
+					if(pMaxEdgeArr[i] < pMaxEdgeArr[i+1]) {
+						cout << "Max heap sort fail !!" << endl;
+						break;
+					}
 				}
 			}
+
 
 			for(i=0 ; i<g.VertexNum ; i++) {
 				g.Varr.getVertex(i).makeSet();
@@ -1160,8 +1189,6 @@ template<typename T> class Kruskal {
 				i = g.getVertexArr().getVertex(i).getDad();
 			}
 			cout << "-> source : " << Source << endl;
-
-			free(pMaxEdgeArr);
 
 			/*
 			pe = pMSTHead;
