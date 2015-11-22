@@ -7,7 +7,7 @@ using namespace std;
 /*#define VERTEXNUM	5000	*/
 /*#define EDGENUM		6*/
 
-#define RETRYCNT	50
+#define RETRYCNT	500
 #define WEIGHTRANGE	5000	
 #define UNSEEN 		0x1
 #define FRINGE		0x10
@@ -165,7 +165,7 @@ template <typename T> class Vertex {
 			status = UNSEEN;
 			EdgeNum = 0;
 			EdgeLimit = el;
-			color = 255; /* 255 : white, 128 : gray, 0 : black */
+			color = WHITE; 
 		}
 
 		void makeSet() {
@@ -403,18 +403,16 @@ template<typename T> class Graph {
 	public : 
 		int VertexNum;
 		int EdgeNum;
-		int Source, Target;
+		/*int Source, Target;*/
 		VertexArr<T> Varr;
 		EdgeArr<T> Earr;
 		clock_t start, end;
 
 		Graph() { }
 		~Graph() { }
-		void initGraph(int vn, int en, int s, int t) {
+		void initGraph(int vn, int en) {
 			VertexNum = vn;
 			EdgeNum = en;
-			Source = s;
-			Target = t;
 		}
 
 		VertexArr<T>& getVertexArr() {
@@ -435,6 +433,7 @@ template<typename T> class Graph {
 		}
 
 		void makeTestPath() {
+#if 0
 			editEdge4Test(0, 203, 2, WEIGHTRANGE+1);
 			editEdge4Test(203, 2043, 5, WEIGHTRANGE+1);
 			editEdge4Test(2043, 1837, 0, WEIGHTRANGE+1);
@@ -481,6 +480,7 @@ template<typename T> class Graph {
 			editEdge4Test(390, 1212, 5, WEIGHTRANGE+1);
 			editEdge4Test(1212, 4022, 3, WEIGHTRANGE+1);
 			editEdge4Test(4022, 1024, 3, WEIGHTRANGE+1);
+#endif
 		}
 
 		void genGraph() {
@@ -674,25 +674,25 @@ template <typename T> class Heap {
 			   swap and move down */
 			while(ph[i] < ph[lc] || ph[i] < ph[rc]) {
 				if(ph[lc] >= ph[rc] && ph[lc] > ph[i]) {
-					xSwap(ph[lc], ph[i]);
+					xSwap(lc, i);
 					i = lc;
 					lc = 2*i + 1;
 					rc = lc + 1;
 					if(lc == stop) {
 						if(ph[lc] >= ph[i]) 
-							xSwap(ph[lc], ph[i]);
+							xSwap(lc, i);
 					}
 
 					if(lc >= stop) break;
 
 				} else if(ph[lc] < ph[rc] && ph[rc] > ph[i]) {
-					xSwap(ph[rc], ph[i]);
+					xSwap(rc, i);
 					i = rc;
 					lc = 2*i + 1;
 					rc = lc + 1;
 					if(lc == stop) {
 						if(ph[lc] >= ph[i]) 
-							xSwap(ph[lc], ph[i]);
+							xSwap(lc, i);
 					}
 
 					if(lc >= stop) break;
@@ -725,7 +725,7 @@ template <typename T> class Heap {
 				}
 			}
 			if(b) {
-				/*cout << "correct max heap." << endl;*/
+				cout << "correct max heap." << endl;
 				return true;
 			} else {
 				cout << " not correct max heap." << endl;
@@ -734,12 +734,6 @@ template <typename T> class Heap {
 		}
 
 		/* swap func */
-		void xSwap(T &lhs, T &rhs) {
-			T temp;
-			temp = lhs;
-			lhs = rhs;
-			rhs = temp;
-		}
 
 		void xSwap(int i, int j) {
 			T temp;
@@ -774,7 +768,7 @@ template <typename T> class Heap {
 
 			/* move up the current vertex to the proper location*/
 			while(ph[par] < ph[cur]) {
-				xSwap(ph[par], ph[cur]);
+				xSwap(par, cur);
 				cur = par;
 				par = (int)((cur-1)/2);
 			}
@@ -786,12 +780,10 @@ template <typename T> class Heap {
 		   move it down to correct loaction */
 		T& xMaximum() {
 			int child, cur = 0;
-			T data = ph[0];
-			xSwap(ph[0], ph[last-1]);
+			xSwap(0, last-1);
 			last -= 1;
 			xMovedown(0, last-1);
 
-			/*return data;*/
 			return ph[last];
 		}
 
@@ -807,7 +799,7 @@ template <typename T> class Heap {
 			/* if current is larger than parent, 
 			   then it should move up */
 			while(ph[par] < ph[cur]) {
-				xSwap(ph[par], ph[cur]);
+				xSwap(par, cur);
 				cur = par;
 				par = (int)((cur-1)/2);
 				if(par<0) break;
@@ -821,12 +813,12 @@ template <typename T> class Heap {
 				if(ph[cur] > ph[lc] && ph[cur] > ph[rc]) {
 					break;
 				} else if(ph[rc] > ph[lc]) {
-					xSwap(ph[cur], ph[rc]);
+					xSwap(cur, rc);
 					cur = rc;
 					lc = cur*2+1;
 					rc = lc + 1;
 				} else {
-					xSwap(ph[cur], ph[lc]);
+					xSwap(cur, lc);
 					cur = lc;
 					lc = cur*2+1;
 					rc = lc + 1;
@@ -838,7 +830,7 @@ template <typename T> class Heap {
 		   move last item to the deleted item's location
 		   and rearrange it */
 		void xDelete(int idx) {
-			xSwap(ph[idx], ph[last-1]);
+			xSwap(idx, last-1);
 			last -= 1;
 			rearrange(idx);
 		}
@@ -847,37 +839,29 @@ template <typename T> class Heap {
 
 template<typename T> class Dijkstra {
 	public: 
+		Vertex<T> refv;
 		Graph<T> g;
 		clock_t start, end;
+		int Source, Target;
 
 		Dijkstra(Graph<T>& gref) {
 			g = gref;
 		}
-		Dijkstra(int vn, int en, int ss, int tt) {
-			g.initGraph(vn, en, ss, tt);
+		Dijkstra(int vn, int en) {
+			g.initGraph(vn, en);
 			g.genGraph();
-			/*g.connectAllVertices();*/
-		}
-
-		/*
-		bool chkGraph() {
-			return g.chkGraph();
-		}
-		*/
-
-		void setSrcTarget(int s, int t) {
-			this.Source = s;
-			this.Target = t;
+			g.connectAllVertices();
 		}
 
 		void makeTestPath() {
 			g.makeTestPath();
 		}
 
-		void findMaxBWPathHeap() {
+		void findMaxBWPathHeap(int s, int t) {
 			int i, v, w, max = 0, min, cap, wt;
+			Source = s;
+			Target = t;
 			Edge<T> *pe;
-			Vertex<T> refv;
 			Heap< Vertex<T> > H(g.VertexNum);
 
 			start = clock();
@@ -889,18 +873,18 @@ template<typename T> class Dijkstra {
 			}
 
 			/* set source INTREE */
-			g.getVertexArr().getVertex(g.Source).setStatus(INTREE);
+			g.getVertexArr().getVertex(Source).setStatus(INTREE);
 			/* set source neighbor as FRINGE */
-			pe = g.getVertexArr().getVertex(g.Source).getHead();
+			pe = g.getVertexArr().getVertex(Source).getHead();
 			while(pe) {
 				g.getVertexArr().getVertex(pe->w).setStatus(FRINGE);
-				g.getVertexArr().getVertex(pe->w).setDad(g.Source);
+				g.getVertexArr().getVertex(pe->w).setDad(Source);
 				g.getVertexArr().getVertex(pe->w).setCap(pe->getWt());
 				H.xInsert(g.getVertexArr().getVertex(pe->w));
 				pe = pe->next;
 			}
 
-			while(g.getVertexArr().getVertex(g.Target).getStatus() != INTREE) {
+			while(g.getVertexArr().getVertex(Target).getStatus() != INTREE) {
 				refv = H.xMaximum();
 				v = refv.getIdx();
 				/* temp for debugging purpose */
@@ -917,7 +901,7 @@ template<typename T> class Dijkstra {
 						min = cap>wt ? wt : cap;
 						g.getVertexArr().getVertex(pe->w).setCap(min);
 						H.xInsert(g.getVertexArr().getVertex(pe->w));
-						if(!H.xChkHeap()) return;
+						/*if(!H.xChkHeap()) return;*/
 
 					} else if(g.getVertexArr().getVertex(pe->w).getStatus() == FRINGE) {
 						cap = g.getVertexArr().getVertex(v).getCap();
@@ -933,7 +917,7 @@ template<typename T> class Dijkstra {
 							}
 							H.ph[i] = g.getVertexArr().getVertex(pe->w);
 							H.rearrange(i);
-							if(!H.xChkHeap()) return;
+							/*if(!H.xChkHeap()) return;*/
 						}
 					}
 					pe = pe->next;
@@ -945,13 +929,13 @@ template<typename T> class Dijkstra {
 			/*cout << "dijkstra w/ heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << endl;*/
 			cout << "dijkstra with heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
-			i = g.getVertexArr().getVertex(g.Target).getDad();
-			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
-			while(i != g.Source) {
+			i = g.getVertexArr().getVertex(Target).getDad();
+			cout << "target : " << Target << " cap : " << g.getVertexArr().getVertex(Target).getCap() << endl;
+			while(i != Source) {
 				cout << "-> Dad : " << i << endl;
 				i = g.getVertexArr().getVertex(i).getDad();
 			}
-			cout << "-> source : " << g.Source << endl;
+			cout << "-> source : " << Source << endl;
 
 			if(checkPath()) cout << "check Path : correct path !!" << endl;
 			else cout << "check Path : not correct !!" << endl;
@@ -960,9 +944,9 @@ template<typename T> class Dijkstra {
 		bool checkPath() {
 			int v, w ;
 			Edge<T> *pe;
-			v = g.getVertexArr().getVertex(g.Target).getDad();
-			w = g.Target;
-			while(v != g.Source) {
+			v = g.getVertexArr().getVertex(Target).getDad();
+			w = Target;
+			while(v != Source) {
 				pe = g.getVertexArr().getVertex(v).Head;
 				while(pe != NULL) {
 					if((pe->v == v && pe->w == w) || (pe->v == w && pe->w==v))
@@ -985,8 +969,10 @@ template<typename T> class Dijkstra {
 			return true;
 		}
 
-		void findMaxBWPath() {
+		void findMaxBWPath(int s, int t) {
 			int i, v, w, max = 0, min, cap, wt;
+			Source = s;
+			Target = t;
 			Edge<T> *pe;
 
 			start = clock();
@@ -998,17 +984,17 @@ template<typename T> class Dijkstra {
 			}
 
 			/* set source INTREE */
-			g.getVertexArr().getVertex(g.Source).setStatus(INTREE);
+			g.getVertexArr().getVertex(Source).setStatus(INTREE);
 			/* set source neight as FRINGE */
-			pe = g.getVertexArr().getVertex(g.Source).getHead();
+			pe = g.getVertexArr().getVertex(Source).getHead();
 			while(pe) {
 				g.getVertexArr().getVertex(pe->w).setStatus(FRINGE);
-				g.getVertexArr().getVertex(pe->w).setDad(g.Source);
+				g.getVertexArr().getVertex(pe->w).setDad(Source);
 				g.getVertexArr().getVertex(pe->w).setCap(pe->getWt());
 				pe = pe->next;
 			}
 
-			while(g.getVertexArr().getVertex(g.Target).getStatus() != INTREE) {
+			while(g.getVertexArr().getVertex(Target).getStatus() != INTREE) {
 				max = 0; 
 				v = -1;
 				/* pick the vertex with largest BW in FRINGE */
@@ -1047,13 +1033,13 @@ template<typename T> class Dijkstra {
 			end = clock();
 			cout << "dijkstra w/o heap takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
-			i = g.getVertexArr().getVertex(g.Target).getDad();
-			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
-			while(i != g.Source) {
+			i = g.getVertexArr().getVertex(Target).getDad();
+			cout << "target : " << Target << " cap : " << g.getVertexArr().getVertex(Target).getCap() << endl;
+			while(i != Source) {
 				cout << "-> Dad : " << i << endl;
 				i = g.getVertexArr().getVertex(i).getDad();
 			}
-			cout << "-> source : " << g.Source << endl;
+			cout << "-> source : " << Source << endl;
 			if(checkPath()) cout << "check Path : correct path !!" << endl;
 			else cout << "check Path : not correct !!" << endl;
 		}
@@ -1061,44 +1047,39 @@ template<typename T> class Dijkstra {
 
 template<typename T> class Kruskal {
 	public:
+		int Source, Target;
 		Graph<T> g;
 		/*EdgeArr<T> Earr;*/
 		Edge<T> *pMSTHead;
+		Edge<T> *pMaxEdgeArr;
 		clock_t start, end;
 
 		Kruskal(Graph<T>& gref) {
 			g = gref;
 		}
 
-		Kruskal(int vn, int en, int ss, int tt) {
+		Kruskal(int vn, int en) {
 			pMSTHead = NULL;
-			g.initGraph(vn, en, ss, tt);
+			g.initGraph(vn, en);
 			g.genGraph();
-			/*g.connectAllVertices();*/
+			g.connectAllVertices();
 		}
-
-		/*
-		bool chkGraph() {
-			return g.chkGraph();
-		}
-		*/
-
-		void setSrcTarget(int s, int t) {
-			this.Source = s;
-			this.Target = t;
+		~Kruskal() {
 		}
 
 		void makeTestPath() {
 			g.makeTestPath();
 		}
 
-		void findMaxBWPathKruskal() {
+		void findMaxBWPath(int s, int t) {
 			int i, r, l;
 			int v, w;
 			int s1, s2;
+
+			Source = s;
+			Target = t;
 			Edge<T> e;
 			Edge<T> *pe;
-			Edge<T> *pMaxEdgeArr;
 			/* should not use this. this takes O(n*m*m) */
 			/* genEdgeArr generate max heap */
 			/*
@@ -1107,7 +1088,7 @@ template<typename T> class Kruskal {
 			end = clock();
 
 			cout << "kruskal making edge list takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
-			*/
+			 */
 
 			start = clock();
 			/* heap sort*/
@@ -1116,8 +1097,8 @@ template<typename T> class Kruskal {
 				g.Earr.H.xMovedown(0, i-1);
 			}
 
-			/* reorder the heap sort with non-increasing order*/
 			pMaxEdgeArr = (Edge<T> *)malloc(sizeof(Edge<T>)*g.Earr.getSize());
+			/* reorder the heap sort with non-increasing order*/
 			for(i=0 ; i<g.Earr.getSize() ; i++) {
 				pMaxEdgeArr[i] = g.Earr.H.ph[g.Earr.getSize()-1-i];
 			}
@@ -1134,7 +1115,14 @@ template<typename T> class Kruskal {
 
 			for(i=0 ; i<g.VertexNum ; i++) {
 				g.Varr.getVertex(i).makeSet();
+				g.Varr.getVertex(i).setColor(WHITE);
+				g.Varr.getVertex(i).setDad(-1);
+				g.Varr.getVertex(i).setCap(0);
 			}
+			for(i=0 ; i<g.Earr.getSize() ; i++) {
+				g.Earr.getEdge(i).pMSTNext = NULL;
+			}
+			pMSTHead = NULL;
 
 			start = clock();
 			/* build MST */
@@ -1151,8 +1139,8 @@ template<typename T> class Kruskal {
 					g.Varr.unionSet(s1, s2);
 					/*cout << "v : " << v << ", w: " << w << endl;*/
 				}
-				if(g.Varr.findSet(g.Varr.getVertex(g.Source)) 
-					== g.Varr.findSet(g.Varr.getVertex(g.Target))) {
+				if(g.Varr.findSet(g.Varr.getVertex(Source)) 
+					== g.Varr.findSet(g.Varr.getVertex(Target))) {
 					/*cout << "found !! " << endl;*/
 					break;
 				}
@@ -1161,18 +1149,19 @@ template<typename T> class Kruskal {
 			cout << "kruskal building MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
 			start = clock();
-			DFS(g.Source);
+			DFS(Source);
 			end = clock();
 			cout << "kruskal finding path in MST takes " << ((double)(end-start)/CLOCKS_PER_SEC) << " sec" << endl;
 
-			i = g.getVertexArr().getVertex(g.Target).getDad();
-			cout << "target : " << g.Target << " cap : " << g.getVertexArr().getVertex(g.Target).getCap() << endl;
-			while(i != g.Source) {
+			i = g.getVertexArr().getVertex(Target).getDad();
+			cout << "target : " << Target << " cap : " << g.getVertexArr().getVertex(Target).getCap() << endl;
+			while(i != Source) {
 				cout << "-> Dad : " << i << endl;
 				i = g.getVertexArr().getVertex(i).getDad();
 			}
-			cout << "-> source : " << g.Source << endl;
+			cout << "-> source : " << Source << endl;
 
+			free(pMaxEdgeArr);
 
 			/*
 			pe = pMSTHead;
@@ -1181,16 +1170,14 @@ template<typename T> class Kruskal {
 				pe = pe->pMSTNext;
 			}
 			*/
-
-			free(pMaxEdgeArr);
 		}
 
 		void DFS(int v) {
 			int cap, wt, min;
 			Edge<T> *pe;
 
-			if(v == g.Source) g.getVertexArr().getVertex(g.Source).setCap(INFINITE);
-			if(v == g.Target) return;
+			if(v == Source) g.getVertexArr().getVertex(Source).setCap(INFINITE);
+			if(v == Target) return;
 
 			pe = pMSTHead;
 			g.getVertexArr().getVertex(v).setColor(GRAY);
@@ -1205,6 +1192,7 @@ template<typename T> class Kruskal {
 						g.getVertexArr().getVertex(pe->w).setCap(min);
 						DFS(pe->w);
 						g.Varr.getVertex(pe->w).setDad(v);
+						if(pe->w == Target) break;
 					}
 				} else if(pe->w == v) {
 					if(g.Varr.getVertex(pe->v).getColor() == WHITE) {
@@ -1214,6 +1202,7 @@ template<typename T> class Kruskal {
 						g.getVertexArr().getVertex(pe->v).setCap(min);
 						DFS(pe->v);
 						g.Varr.getVertex(pe->v).setDad(v);
+						if(pe->v == Target) break;
 					}
 				}
 				pe = pe->pMSTNext;

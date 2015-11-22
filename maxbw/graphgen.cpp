@@ -17,12 +17,8 @@ int main()
 	cin >> vn;
 	cout << "input edge number : " << endl;
 	cin >> en;
-	cout << "input Source : " << endl;
-	cin >> ss;
-	cout << "input Target : " << endl;
-	cin >> tt;
 
-	g.initGraph(vn, en, ss, tt);
+	g.initGraph(vn, en);
 	g.genGraph();
 	g.chkGraph();
 

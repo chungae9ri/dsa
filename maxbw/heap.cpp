@@ -9,14 +9,14 @@ using namespace std;
 int main()
 {
 	int vn;
-	int c, i, maxi, cntdel=0, cntinst=0, cntmax=0;
+	int c = 'c', i, maxi, cntdel=0, cntinst=0, cntmax=0;
 	float stretch = 10000.f;
 	int *D;
 
 	cout << "input Heap size : " << endl;
 	cin >> vn;
 	D = (int *)malloc(sizeof(int) * vn);
-	heap<int> H(vn);
+	Heap<int> H(vn);
 	H.xHeapify();
 	H.xChkHeap();
 
@@ -54,7 +54,11 @@ int main()
 		/*scanf("%d", &i);*/
 		cin >> i;
 		cout << "value of " << i << " is " << D[H.ph[i+1]] << endl;
+		cout << "------------------------------" << endl;
+		cout << "press q to quit or press any key to continue " << endl;
 		c = getchar();
+		c = getchar();
+		if(c == 'q') break;
 	}
 
 	H.xChkHeap();
