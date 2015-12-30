@@ -24,28 +24,28 @@ void swap (char *x, char *y)
    a : array that stores user input.
    i : Starting index of the string
    n : Ending index of the string. */
-void permute(char *a, int i, int n) 
+void permute(char *a, int s, int e) 
 {
-	int j; 
+	int i; 
 	/* if the recursive call reaches the bottom(end),
 	   it should save the current string to file(q1out.txt) and
 	   it goes back the path.
 	 */
-	if (i == n) {
+	if (s == e) {
 		/* add null string to mark the end of string */
-		a[n+1] = '\0';
-		/*printf("%s\r\n", a);*/
+		a[e+1] = '\0';
 		/* save the string to file */
 		fprintf(gfp,"%s\r\n", a);
+		printf("%s\n", a);
 	} else {
 		/* get the swap index */
-		for (j = i; j <= n; j++) {
+		for (i = s; i <= e; i++) {
 			/* swap current index char with next index char */
-			swap((a+i), (a+j));
+			swap((a+s), (a+i));
 			/* recursive call to go to next depth */
-			permute(a, i+1, n);
+			permute(a, s+1, e);
 			/* need to restore the swapped character for future use */
-			swap((a+i), (a+j)); 
+			swap((a+s), (a+i)); 
 		}
 	}
 }
