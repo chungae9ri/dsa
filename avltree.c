@@ -355,13 +355,24 @@ struct tnode *findsuccessor(struct tnode *pn)
 {
 	struct tnode *cur;
 	if(!pn) return NULL;
-	
-	cur = pn->right;
-	if(!cur) return NULL;
-	while(cur->left) {
-		cur = cur->left;
+
+	/* if cur has right subtree, 
+	   then return leftmost node of right subtree.
+	   else if not right subtree, 
+	   then return the parent of upper most node until cur == cur->par->right */
+	if(pn->right) {
+		cur = pn->right;
+		while(cur->left) {
+			cur = cur->left;
+		}
+		return cur;
+	} else {
+		while(cur == cur->par->right) {
+			/* go up */
+			cur = cur->par; 
+		}
+		return cur->par;
 	}
-	return cur;
 }
 
 void xdelete(struct tnode **pn, struct tnode tn)
@@ -606,7 +617,7 @@ void deletetree(struct tnode *pn)
 	else {
 		deletetree(pn->left);
 		temp = pn->right;
-		printf("delete tree : %s, key : %d\n", pn->name, pn->key);
+		/*printf("delete tree : %s, key : %d\n", pn->name, pn->key);*/
 		free(pn);
 		pn = NULL;
 		deletetree(temp);
