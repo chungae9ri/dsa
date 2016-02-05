@@ -27,10 +27,10 @@ template<typename T> class diterator {
 	Node<T> *cur;
 	public:
 		diterator(Node<T> *p):cur(p) {
-			/*cout << "con diterator" << endl;*/
+			cout << "con diterator" << endl;
 		}
 		~diterator() {
-			/*cout << "des diterator" << endl;*/
+			cout << "des diterator" << endl;
 		}
 
 		Node<T> *getCur() {return cur;}

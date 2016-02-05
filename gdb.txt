@@ -4,7 +4,7 @@ g++/gcc -g a.c
 commands
 1. gdb a.out : debugging start
 2. b(reak) main, b line#, b srcfile:line#, b +offset/-offset, b *address
-   : break main, b insert if expr : break insert if expr is true
+   : break main, b insert if expr : break insert if expr is true ex) b add if i<100
 3. r(un) : run now
 4. s : go one step, step into func
 5. n : step over function, 
@@ -25,7 +25,7 @@ commands
 11. untile line# : execute program until line#
 12. list : list next/previous few lines of program
 13. x <var, mem addr> : display the contents of the mem location
-    ex) assuem s1="hello there"
+    ex) assume s1="hello there"
     x/s s1 : hello there
     x/d s1 : 72
     x/8d s1 : 72 101 108 111 32 84 104
@@ -35,10 +35,11 @@ commands
     info args : show arg values
     info registers : show registers
     info b : show break points
-16 set <var> to <exp> : set <var> = <exp>
+16 set <var> to <exp> : set <var> = <exp> ex) set $pc=0x8000
 17. delete breakpoint# : delete breakpoint#
     clear : delete all breakpoints
     clear func :
     clear filename:func : clear
     clear line#
     clear filename:line#
+18. display/i $pc : disassemble current location(pc)
