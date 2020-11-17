@@ -7,6 +7,15 @@
 #include <chrono>
 
 #define INF	0x7FFFFFFF;
+#define _PRINT_GRAPH_	0
+// performance test for reference_wrapper, shared_ptr and naked pointer
+// naked pointer is always winner.
+// reference_wrapper is a little bit slower than naked pointer
+// shared_ptr takes much longer than other, almost two times than naked pointer
+// vertex 100000, neighbor 20 (random), src 0, tgt 99999
+// naked pointer takes 1623208msec
+// reference_wrapper takes 1858301msec
+// shared_ptr takes 2759880msec
 
 enum class eSTATUS {
 	UNSEEN,
@@ -25,6 +34,7 @@ using ESPTR = std::shared_ptr<edge*>;
 
 using IT = std::multiset<VREF>::iterator;
 using ITPTR = std::multiset<VSPTR>::iterator;
+using ITNPTR = std::multiset<vertex*>::iterator;
 
 class vertex {
 	public:
@@ -35,17 +45,17 @@ class vertex {
 		eSTATUS status;
 		std::vector<VREF> nei;
 		std::vector<VSPTR> pnei;
+		std::vector<vertex*> pnnei;
 		vertex(int i):idx{i} {
 			dist = INF;
 			weight = std::rand() % 100 + 1;
 			status = eSTATUS::UNSEEN;
 			par_idx = -1;
+			/*std::cout << "vertex(" << idx << ")\n";*/
 		}
 
 		~vertex() {
-			//std::cout << "~vertex(" << idx <<")" << "\n";
-			nei.clear();
-			pnei.clear();
+			/*std::cout << "~vertex(" << idx <<")" << "\n";*/
 		}
 };
 
@@ -65,6 +75,7 @@ class graph {
 	public:
 		std::vector<vertex> vertices;
 		std::vector<VSPTR> pvertices;
+		std::vector<vertex*> pnvertices;
 		std::vector<edge> edges;
 
 		graph(int v_count, int n_count) {
@@ -73,6 +84,9 @@ class graph {
 				auto pv = new vertex(i);
 				pv->weight = vertices[i].weight;
 				pvertices.push_back(std::make_shared<vertex>(*pv));
+				auto pnv = new vertex(i);
+				pnv->weight = vertices[i].weight;
+				pnvertices.push_back(pnv);
 			}
 
 			for (auto& v: vertices) {
@@ -93,14 +107,17 @@ class graph {
 					if (!alreadyin) {
 						v.nei.push_back(std::ref(vertices[nei_idx]));
 						pvertices[v.idx]->pnei.push_back(pvertices[nei_idx]);
+						pnvertices[v.idx]->pnnei.push_back(pnvertices[nei_idx]);
 						vertices[nei_idx].nei.push_back(std::ref(v));
 						pvertices[nei_idx]->pnei.push_back(pvertices[v.idx]);
+						pnvertices[nei_idx]->pnnei.push_back(pnvertices[v.idx]);
 						//
 						auto e = edge(std::ref(v), std::ref(vertices[nei_idx]));
 						edges.push_back(e);
 					}
 				}
 			}
+#if _PRINT_GRAPH_
 
 			std::cout << "\n vertices using std::reference_wrapper\n";
 			for (auto& v : vertices) {
@@ -118,8 +135,86 @@ class graph {
 				}
 				std::cout << "\n";
 			}
+			std::cout << "\n vertices using naked ptr\n";
+			for (auto& pv : pnvertices) {
+				std::cout << pv->idx << " has " ;
+				for (auto& pw: pv->pnnei) {
+					std::cout << pw->idx << "(" << pv->weight + pw->weight << ")" << ", ";
+				}
+				std::cout << "\n";
+			}
+#endif
 		}
 		~graph() {
+			for (auto pv : pnvertices)
+				delete pv;
+		}
+};
+
+class vptrnComp{
+	public:
+		bool operator()(vertex *v, vertex *w) {
+			return (v->dist < w->dist);
+		}
+};
+
+class dijkstra_nkd_ptr {
+	public:
+		std::vector<vertex*> mst;
+		std::multiset<vertex*, vptrnComp> fringeSet;
+		void operator()(graph &g, int sIdx, int tIdx) {
+			auto ps = g.pnvertices[sIdx];
+			auto pt = g.pnvertices[tIdx];
+			ps->dist = 0;
+			for (auto pv : ps->pnnei) {
+				pv->dist = ps->dist + ps->weight + pv->weight;
+				pv->par_idx = ps->idx;
+				pv->status = eSTATUS::FRINGE;
+				fringeSet.insert(pv);
+			}
+			while(!fringeSet.empty()) {
+				auto itr = fringeSet.begin();
+				/*auto curpv = (*itr);*/
+				auto curpv = g.pnvertices[(*itr)->idx];
+				fringeSet.erase(itr);
+				curpv->status = eSTATUS::INTREE;
+				mst.push_back(curpv);
+				for (auto pv : curpv->pnnei) {
+					if (pv->status == eSTATUS::UNSEEN) {
+						pv->dist = curpv->dist + (curpv->weight + pv->weight);
+						pv->par_idx = curpv->idx;
+						pv->status = eSTATUS::FRINGE;
+						fringeSet.insert(pv);
+					} else if (pv->status == eSTATUS::FRINGE) {
+						auto temp = curpv->dist + (curpv->weight + pv->weight);
+						if (pv->dist > temp) {
+							std::pair<ITNPTR, ITNPTR> ret = fringeSet.equal_range(pv);
+							for (auto t = ret.first; t != ret.second; t++) {
+								if ((*t)->idx == pv->idx) {
+									fringeSet.erase(t);
+									break;
+								}
+							}
+							pv->dist = temp;
+							pv->par_idx = curpv->idx;
+							fringeSet.insert(pv);
+						}
+					}
+				}
+			}
+		
+			std::cout << "shortest path with naked ptr" << "\n";
+			for (auto pv : mst) {
+				if (pv->idx == tIdx) {
+					std::cout << pv->idx << "(" << pv->dist << ")";
+					auto pw = g.pnvertices[pv->par_idx];
+					while (pw->idx != ps->idx) {
+						std::cout << " <- " << pw->idx << "(" << pw->dist << ")";
+						pw = g.pnvertices[pw->par_idx];
+					}
+					std::cout << " <- " << ps->idx << "\n";
+				}
+			}
 		}
 };
 
@@ -282,7 +377,8 @@ int main()
 
 	graph g(vNum, nNum);
 	std::cout << "\ngraph has " << g.vertices.size() << " vertices, " << g.edges.size() << " edges" << std::endl;
-
+	std::cout << "\n";
+//
 	dijkstra_ref dij_ref;
 	auto start1 = std::chrono::high_resolution_clock::now();
 	dij_ref(g, sIdx, tIdx);
@@ -297,6 +393,14 @@ int main()
 	auto end2 = std::chrono::high_resolution_clock::now();
 	auto elapse2 = std::chrono::duration_cast<std::chrono::microseconds>(end2 - start2);
 	std::cout << "shared_ptr imple for dijkstra takes " << elapse2.count() <<"msec\n"; 
+	std::cout << "\n";
+
+	dijkstra_nkd_ptr dij_nkd_ptr;
+	auto start3 = std::chrono::high_resolution_clock::now();
+	dij_nkd_ptr(g, sIdx, tIdx);
+	auto end3 = std::chrono::high_resolution_clock::now();
+	auto elapse3 = std::chrono::duration_cast<std::chrono::microseconds>(end3 - start3);
+	std::cout << "naked ptr imple for dijkstra takes " << elapse3.count() <<"msec\n"; 
 
 	return 0;
 }
