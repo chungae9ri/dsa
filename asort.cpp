@@ -34,8 +34,8 @@ class Entry {
 		}
 };
 
-
-void heapify(vector<Entry<uint64_t>> &v, int32_t len, uint32_t cur)
+template<typename T>
+void heapify(vector<Entry<T>> &v, int32_t len, uint32_t cur)
 {
 	uint32_t largest;
 	uint32_t lc = 2 * cur + 1;
@@ -54,7 +54,8 @@ void heapify(vector<Entry<uint64_t>> &v, int32_t len, uint32_t cur)
 	}
 }
 
-void heap_sort(vector<Entry<uint64_t>> &v)
+template<typename T>
+void heap_sort(vector<Entry<T>> &v)
 {
 	uint32_t len = (uint32_t)v.size();
 	/* build max heap */
@@ -69,7 +70,8 @@ void heap_sort(vector<Entry<uint64_t>> &v)
 
 }
 
-uint32_t partition(vector<Entry<uint64_t>> &v, uint32_t left, uint32_t right)
+template<typename T>
+uint32_t partition(vector<Entry<T>> &v, uint32_t left, uint32_t right)
 {
 	uint32_t last = left;
 
@@ -81,7 +83,8 @@ uint32_t partition(vector<Entry<uint64_t>> &v, uint32_t left, uint32_t right)
 	return last;
 }
 
-void qsort(vector<Entry<uint64_t>> &v, uint32_t left, uint32_t right)
+template<typename T>
+void qsort(vector<Entry<T>> &v, uint32_t left, uint32_t right)
 {
 	uint32_t last; 
 	if (left >= right)
@@ -94,9 +97,10 @@ void qsort(vector<Entry<uint64_t>> &v, uint32_t left, uint32_t right)
 	qsort(v, last + 1, right);
 }
 
-void merge(vector<Entry<uint64_t>> &v, int32_t left, int32_t mid, int32_t right)
+template<typename T>
+void merge(vector<Entry<T>> &v, int32_t left, int32_t mid, int32_t right)
 {
-	vector<Entry<uint64_t>> w(right - left + 1);
+	vector<Entry<T>> w(right - left + 1);
 
 	for (int i = 0, j = left, k = mid + 1; i < w.size(); i++) {
 		if (j == mid + 1) 
@@ -114,7 +118,8 @@ void merge(vector<Entry<uint64_t>> &v, int32_t left, int32_t mid, int32_t right)
 	}
 }
 
-void merge_sort(vector<Entry<uint64_t>> &v, int32_t left, int32_t right)
+template<typename T>
+void merge_sort(vector<Entry<T>> &v, int32_t left, int32_t right)
 {
 	if (left < right) {
 		uint32_t mid = left + (right - left) / 2;
@@ -129,9 +134,10 @@ void merge_sort(vector<Entry<uint64_t>> &v, int32_t left, int32_t right)
  * if not using reference, it takes so long 
  * because every recursing copies the v to the subsequent calls 
  */
-Entry<uint64_t> find_max(const vector<Entry<uint64_t>>& v, int32_t i, int32_t j)
+template<typename T>
+Entry<T> find_max(const vector<Entry<T>>& v, int32_t i, int32_t j)
 {
-	Entry<uint64_t> max(0); 
+	Entry<T> max(0); 
 
 	if (i + 1 == j) {
 		return (v[i] > v[j] ? v[i] : v[j]);
@@ -145,9 +151,10 @@ Entry<uint64_t> find_max(const vector<Entry<uint64_t>>& v, int32_t i, int32_t j)
 		return v[i];
 }
 
-Entry<uint64_t> find_max2(const vector<Entry<uint64_t>>& v)
+template<typename T>
+Entry<T> find_max2(const vector<Entry<T>>& v)
 {
-	Entry<uint64_t > max(0);
+	Entry<T> max(0);
 
 	for (auto& e : v) {
 		if (e > max)
