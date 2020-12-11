@@ -1,8 +1,119 @@
 #ifndef _SORT_H_
 #define _SORT_H_
 #include <vector>
+#include <typeinfo>
+#include <cmath>
+#include <cstring>
 
 namespace mysort {
+	template <typename T>
+		class Entry {
+			public:
+				T key;
+				Entry(T o): key{o} {};
+				Entry(): key{0}{};
+				bool operator<(const Entry& o) {
+					return (this->key < o.key);
+				}
+
+				bool operator>(const Entry& o) {
+					return (this->key > o.key);
+				}
+
+				bool operator<(const Entry& o) const {
+					return (this->key < o.key);
+				}
+
+				bool operator>(const Entry& o) const {
+					return (this->key > o.key);
+				}
+
+				bool operator==(const Entry& o) {
+					return (this->key == o.key);
+				}
+		};
+
+	template<typename T>
+		void radix_sort(std::vector<T>& v, uint32_t radix) {
+			T max;
+			max.key = 0;
+			for (auto p : v) {
+				if (max < p)
+					max = p;
+			}
+			uint32_t digit_num = 1;
+			uint64_t max_num = 1;
+			// C++ stl doesn't have an arbitrary log base 
+			while (max_num * radix < max.key) {
+				max_num *= radix;
+				digit_num++;
+			}
+			int count[radix] = {0,};
+			std::vector<T> w(v.size());
+			// counting sort
+			for (int i = 0; i < digit_num; i++) {
+				std::memset(count, 0, sizeof(count));
+				// counting
+				for (auto p : v) {
+					int r = p.key / std::pow(radix, i);
+					r %= radix;
+					count[r]++;
+				}
+				// actual position from end
+				for (int j = 1; j < radix; j++) 
+					count[j] += count[j - 1];
+				// 
+				for (int j = v.size() - 1; j >= 0; j--) {
+					int r = v[j].key / std::pow(radix, i);
+					r %= radix;
+					w[count[r] - 1] = v[j];
+					count[r]--;
+				}
+				// update source v
+				v = w;
+			}
+
+		}
+	// radix_sort specialization for std::string type key
+	template<> 
+		void radix_sort<Entry<std::string>>(std::vector<Entry<std::string>>& v, uint32_t radix) {
+			Entry<std::string> max;
+			max.key = "";
+			char r;
+			for (auto p: v) {
+				if (p.key.size() > max.key.size()) {
+					max = p;
+				}
+			}
+			int count[radix] = {0, };
+			std::vector<Entry<std::string>> w(v.size());
+			for (int i = 0; i < max.key.size(); i++) {
+				std::memset(count, 0, sizeof(count));
+
+				for (int j = 0; j < v.size(); j++) {
+					if (i > v[j].key.size() - 1) 
+						r = 0;
+					else 
+						r = v[j].key.at(i);
+
+					count[r]++;
+				}
+				for (int j = 1; j < radix; j++)
+					count[j] += count[j - 1];
+
+				for (int j = v.size() - 1; j >= 0; j--) {
+					if (i > v[j].key.size() - 1) 
+						r = 0;
+					else 
+						r = v[j].key.at(i);
+
+					w[count[r] - 1] = v[j];
+					count[r]--;
+				}
+				v = w;
+			}
+
+		}
 	template<typename T>
 		void heapify(std::vector<T> &v, int32_t len, uint32_t cur)
 		{
