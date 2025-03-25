@@ -9,14 +9,21 @@ project(
 set(CMAKE_CXX_STANDARD 20)
 
 # Find the Google Test library (assumes libraries are in /usr/lib)
-find_library(GTEST_LIB gtest)
-find_library(GTEST_MAIN_LIB gtest_main)
+find_package(GTest REQUIRED)
 
-add_subdirectory(libs)
+add_subdirectory(libs/src)
 
 add_executable(
     dsa
-    main.cpp
+    main_test.cpp
 )
 
-target_link_libraries(dsa PRIVATE dsa_libs)
+target_link_libraries(
+    dsa 
+    PRIVATE 
+    GTest::GTest 
+    GTest::Main pthread
+    dsa_libs
+)
+
+target_include_directories(dsa PRIVATE libs/inc)
