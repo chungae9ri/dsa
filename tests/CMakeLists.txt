@@ -12,12 +12,12 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(GTest REQUIRED)
 
 add_executable(
-    dsa
+    dsa_test
     main_test.cpp
 )
 
 target_link_libraries(
-    dsa 
+    dsa_test
     PRIVATE 
     GTest::GTest 
     GTest::Main pthread
