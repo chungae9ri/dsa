@@ -1,7 +1,6 @@
 add_library(
     dsa_lib 
     STATIC
-    src/adder.cpp
     src/functor.cpp
 )
 

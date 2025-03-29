@@ -20,6 +20,6 @@ target_link_libraries(
     dsa_test
     PRIVATE 
     GTest::GTest 
-    GTest::Main pthread
+    pthread
     dsa_lib
 )

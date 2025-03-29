@@ -9,4 +9,5 @@ mkdir ${CUR}/build
 cd ${CUR}/build
 cmake ..
 cmake --build .
-pytest ${CUR}/build/tests/dsa_test
+#pytest -v ${CUR}/build/tests/dsa_test
+${CUR}/build/tests/dsa_test
