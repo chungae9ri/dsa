@@ -8,18 +8,19 @@
             "type": "pickString",
             "id": "app",
             "description": "c/c++ application",
-            "options": ["a.out"],
-            "default": "a.out"
+            "options": ["dsa_test"],
+            "default": "dsa_test"
         },
     ],
     "configurations": [
     {
-        "name": "(gdb) Launch",
+        "name": "main test",
         "type": "cppdbg",
         "request": "launch",
-        "program": "enter program name, for example ${workspaceFolder}/${input:app}",
+        //"program": "${workspaceFolder}/build/tests/${input:app}",
+        "program": "${workspaceFolder}/build/tests/dsa_test",
         "args": [],
-        "stopAtEntry": false,
+        "stopAtEntry": true,
         "cwd": "${workspaceFolder}",
         "environment": [],
         "externalConsole": false,
