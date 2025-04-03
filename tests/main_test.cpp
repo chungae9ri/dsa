@@ -14,7 +14,7 @@ static int test_index = 0;
 class main_test: public ::testing::Test {
 protected:
     void SetUp() override {
-        std::cout << "Test case [" << ++test_index << "] running"<< std::endl;
+        std::cout << "Test Case [" << ++test_index << "] running"<< std::endl;
     }
 };
 
@@ -63,9 +63,10 @@ TEST_F(main_test, union_find_test)
 
 TEST_F(main_test, percolation_test)
 {
-    quick_uf::percolation perco{5 * 5};
+    quick_uf::percolation perco{5};
 
     perco.initialize_cells(10);
+    perco.build_union_set();
 
 }
 

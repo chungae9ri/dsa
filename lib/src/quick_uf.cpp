@@ -8,19 +8,18 @@ namespace quick_uf
 {
     quick_uf::quick_uf(int n): sz(n)
     {
-        id = std::make_unique<int[]>(sz);
         for (int i = 0; i < sz; i++) {
-            id[i] = i;
+            id.push_back(i);
         }
     }
 
     void quick_uf::union_set(int p, int q)
     {
-        if (id.get()[p] == id.get()[q]) {
+        if (id[p] == id[q]) {
             return;
         }
 
-        id.get()[q] = id.get()[p];
+        id[q] = id[p];
     }
 
     int quick_uf::root(int p)
@@ -29,16 +28,16 @@ namespace quick_uf
         int trace_len = 0;
         int i = 0;
 
-        while (id.get()[p] != p) {
+        while (id[p] != p) {
             trace[i++] = p;
-            p = id.get()[p];
+            p = id[p];
         }
 
         trace_len = i;
 
         // path compression for flattening
         for (i = 0; i < trace_len; i++) {
-            id.get()[trace[i]] = p;
+            id[trace[i]] = p;
         }
 
         return p;
@@ -51,36 +50,73 @@ namespace quick_uf
 
     void percolation::initialize_cells(int open_num)
     {
-        // 0. Initialize array as closed
+        // 0. initialize array as closed
         for (int i = 0; i < get_sz(); i++) {
-            get_id_arr()[i] = 0;
+            get_id_vec()[i] = 0;
         }
 
-        // 1. Fill a vector with all values 0..N-1
+        // 1. fill a vector with all values 0..N-1
         std::vector<int> values(get_sz());
         for (int i = 0; i < get_sz(); ++i)
             values[i] = i;
 
-        // 2. Shuffle it randomly
+        // 2. shuffle it randomly
         std::random_device rd;
         std::mt19937 gen(rd());
         std::shuffle(values.begin(), values.end(), gen);
 
-        // 3. Take the first `n` numbers
+        // 3. take the first `n` numbers
         std::vector<int> result(values.begin(), values.begin() + open_num);
 
-        // 4. Set open for the random location cells
+        // 4. set open for the random location cells
         for (int i = 0; i < open_num; i++) {
-            get_id_arr()[result[i]] = 1;
+            auto idx = result[i];
+            // Open the random cells
+            get_id_vec()[idx] = idx;
+            // build start, end cells
+            if (idx < width) {
+                start.push_back(idx);
+            } else if (idx > width * width - width) {
+                end.push_back(idx);
+            }
         }
 
-        for (int i; i < get_sz(); i++) {
-            std::cout << "idx[" << i << "]: " << get_id_arr()[i] << std::endl;
+        show_cells();
+    }
+
+    void percolation::build_union_set(void) 
+    {
+        for (int i = 0; i < get_sz(); i++) {
+            if (get_id_vec()[i] != 0) {
+                if ((i % width != width - 1) && (get_id_vec()[i + 1] != 0)) {
+                    union_set(i, i + 1);
+                }
+                if ((i < (get_sz() - width)) && (get_id_vec()[i + width] != 0)) {
+                    union_set(i, i + width);
+                }
+            }
         }
+
+        show_cells();
+    }
+
+    void percolation::show_cells(void){
+        for (int i = 0; i < get_sz(); i++) {
+            std::cout << "idx[" << i << "]: " << get_id_vec()[i] << std::endl;
+        }
+    }
+
+    bool percolation::is_connected(int p, int q)
+    {
+        return true;
     }
 
     bool percolation::is_percolated(void)
     {
+        for (auto i : start) {
+
+        }
+
         return true;
     }
 }
