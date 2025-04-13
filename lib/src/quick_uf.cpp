@@ -1,8 +1,9 @@
 #include <iostream>
-#include <quick_uf.hpp>
 #include <vector>
 #include <algorithm> // for shuffle
 #include <random>
+
+#include <quick_uf.hpp>
 
 namespace quick_uf
 {
@@ -62,8 +63,6 @@ void percolation::initialize_cells(int w, int open_num)
 	width = w;
 	start = {};
 	end = {};
-	// start = {1};
-	// end = {20, 23, 24};
 
 	// 2 initialize array as closed
 	for (int i = 0; i < get_sz(); i++) {

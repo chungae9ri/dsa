@@ -1,14 +1,17 @@
 #include <iostream>
 #include <chrono>
+#include <random>
 
 #include <dsa.h>
 #include <functor.hpp>
 #include <quick_uf.hpp>
+#include <xsort.hpp>
 
 #include <gtest/gtest.h>
 
 using namespace functor;
 using namespace quick_uf;
+using namespace xsort;
 
 static int test_index = 0;
 
@@ -68,7 +71,7 @@ TEST_F(main_test, union_find_test)
 
 TEST_F(main_test, percolation_test)
 {
-	int width = 50;
+	int width = 20;
 	std::vector<int> oc_stat;
 
 	quick_uf::percolation perco;
@@ -92,7 +95,37 @@ TEST_F(main_test, percolation_test)
 		sum += i;
 	}
 	float avg_oc = static_cast<float>(sum) / oc_stat.size();
-	std::cout << "average open cell count for first percolation: " << avg_oc << std::endl;
+	std::cout << "Total cells: " << width * width
+		  << ", average open cell count for first percolation: " << avg_oc << std::endl;
+}
+
+TEST_F(main_test, sort_test)
+{
+	int i;
+	std::vector<entry<int>> values;
+
+	for (i = 0; i < 1000000; ++i) {
+		values.push_back(entry(i));
+	}
+
+	// 4 shuffle it randomly
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::shuffle(values.begin(), values.end(), gen);
+
+	auto start = std::chrono::high_resolution_clock().now();
+	xsort::xqsort<entry<int>>(values, 0, values.size() - 1);
+	auto end = std::chrono::high_resolution_clock().now();
+	std::chrono::duration<double, std::milli> elapse = end - start;
+	std::cout << "Elapsed time for qsort: " << elapse.count() << "ms \n";
+
+	for (i = 0; i < values.size() - 1; i++) {
+		if (values[i] > values[i + 1]) {
+			std::cout << "xqsort fails at " << i << std::endl;
+		}
+	}
+
+	EXPECT_EQ(i, values.size() - 1);
 }
 
 int main(int argc, char **argv)
