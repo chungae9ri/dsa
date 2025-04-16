@@ -15,6 +15,15 @@ using namespace xsort;
 
 static int test_index = 0;
 
+#define SORT_SAMPLE_NUM (1000000U)
+
+template <class T> void shuffle(std::vector<T> &v)
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::shuffle(v.begin(), v.end(), gen);
+}
+
 class main_test : public ::testing::Test
 {
       protected:
@@ -99,22 +108,19 @@ TEST_F(main_test, percolation_test)
 		  << ", average open cell count for first percolation: " << avg_oc << std::endl;
 }
 
-TEST_F(main_test, sort_test)
+TEST_F(main_test, qsort_test)
 {
 	int i;
-	std::vector<entry<int>> values;
+	std::vector<entry<uint32_t>> values;
 
-	for (i = 0; i < 1000000; ++i) {
-		values.push_back(entry(i));
+	for (i = 0; i < SORT_SAMPLE_NUM; ++i) {
+		values.push_back(entry(SORT_SAMPLE_NUM - i));
 	}
 
-	// 4 shuffle it randomly
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::shuffle(values.begin(), values.end(), gen);
+	shuffle(values);
 
 	auto start = std::chrono::high_resolution_clock().now();
-	xsort::xqsort<entry<int>>(values, 0, values.size() - 1);
+	xsort::xqsort<entry<uint32_t>>(values, 0, values.size() - 1);
 	auto end = std::chrono::high_resolution_clock().now();
 	std::chrono::duration<double, std::milli> elapse = end - start;
 	std::cout << "Elapsed time for qsort: " << elapse.count() << "ms \n";
@@ -126,6 +132,30 @@ TEST_F(main_test, sort_test)
 	}
 
 	EXPECT_EQ(i, values.size() - 1);
+}
+
+TEST_F(main_test, mergesort_test)
+{
+	int i;
+	std::vector<entry<uint32_t>> values;
+
+	for (i = 0; i < SORT_SAMPLE_NUM; ++i) {
+		values.push_back(entry(SORT_SAMPLE_NUM - i));
+	}
+
+	shuffle(values);
+
+	auto start = std::chrono::high_resolution_clock().now();
+	xsort::xmergesort<entry<uint32_t>>(values, 0, values.size() - 1);
+	auto end = std::chrono::high_resolution_clock().now();
+	std::chrono::duration<double, std::milli> elapse = end - start;
+	std::cout << "Elapsed time for mergesort: " << elapse.count() << "ms \n";
+
+	for (i = 0; i < values.size() - 1; i++) {
+		if (values[i] > values[i + 1]) {
+			std::cout << "xmergesort fails at " << i << std::endl;
+		}
+	}
 }
 
 int main(int argc, char **argv)

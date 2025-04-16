@@ -42,7 +42,7 @@ template <class T> class entry
 	bool operator==(const entry &o) { return (this->val == o.val); }
 };
 
-template <class T> static uint32_t partition(std::vector<entry<T>> &v, uint32_t l, uint32_t r)
+template <class T> uint32_t xpartition(std::vector<entry<T>> &v, uint32_t l, uint32_t r)
 {
 	uint32_t last = l;
 
@@ -61,10 +61,42 @@ template <class T> void xqsort(std::vector<T> &v, uint32_t l, uint32_t r)
 	if (l >= r)
 		return;
 
-	last = xsort::partition(v, l, r);
+	last = xsort::xpartition(v, l, r);
 	std::swap(v[l], v[last]);
 	xsort::xqsort(v, l, last);
 	xsort::xqsort(v, last + 1, r);
+}
+
+template <class T> void xmerge(std::vector<T> &v, uint32_t l, uint32_t m, uint32_t r)
+{
+	uint32_t s = r - l + 1;
+	std::vector<T> w(s);
+
+	for (uint32_t i = 0, j = l, k = m + 1; i < s; i++) {
+		if (j == m + 1) {
+			w[i] = v[k++];
+		} else if (k == r + 1) {
+			w[i] = v[j++];
+		} else if (v[j] < v[k]) {
+			w[i] = v[j++];
+		} else {
+			w[i] = v[k++];
+		}
+	}
+
+	for (uint32_t i = 0, j = 0; i < s; i++, j++) {
+		v[l + i] = w[j];
+	}
+}
+
+template <class T> void xmergesort(std::vector<T> &v, uint32_t l, uint32_t r)
+{
+	if (l < r) {
+		uint32_t m = l + (r - l) / 2;
+		xmergesort(v, l, m);
+		xmergesort(v, m + 1, r);
+		xmerge(v, l, m, r);
+	}
 }
 
 } // namespace xsort
