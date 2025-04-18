@@ -99,4 +99,37 @@ template <class T> void xmergesort(std::vector<T> &v, uint32_t l, uint32_t r)
 	}
 }
 
+template <class T> void xheapify(std::vector<T> &v, uint32_t len, uint32_t cur)
+{
+	uint32_t lc = cur * 2 + 1;
+	uint32_t rc = cur * 2 + 2;
+	uint32_t biggest = cur;
+
+	if (lc < len && v[biggest] < v[lc]) {
+		biggest = lc;
+	}
+	if (rc < len && v[biggest] < v[rc]) {
+		biggest = rc;
+	}
+
+	if (biggest != cur) {
+		std::swap(v[cur], v[biggest]);
+		xheapify(v, len, biggest);
+	}
+}
+
+template <class T> void xheapsort(std::vector<T> &v)
+{
+	uint32_t len = v.size();
+
+	for (int32_t i = len / 2 - 1; i >= 0; i--) {
+		xheapify(v, len, i);
+	}
+
+	for (int32_t i = len - 1; i > 0; i--) {
+		std::swap(v[0], v[i]);
+		xheapify(v, i, 0);
+	}
+}
+
 } // namespace xsort

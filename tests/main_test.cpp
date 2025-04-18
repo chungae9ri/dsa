@@ -158,6 +158,30 @@ TEST_F(main_test, mergesort_test)
 	}
 }
 
+TEST_F(main_test, heapsort_test)
+{
+	int i;
+	std::vector<entry<uint32_t>> values;
+
+	for (i = 0; i < SORT_SAMPLE_NUM; ++i) {
+		values.push_back(entry(SORT_SAMPLE_NUM - i));
+	}
+
+	shuffle(values);
+
+	auto start = std::chrono::high_resolution_clock().now();
+	xsort::xheapsort<entry<uint32_t>>(values);
+	auto end = std::chrono::high_resolution_clock().now();
+	std::chrono::duration<double, std::milli> elapse = end - start;
+	std::cout << "Elapsed time for heapsort: " << elapse.count() << "ms \n";
+
+	for (i = 0; i < values.size() - 1; i++) {
+		if (values[i] > values[i + 1]) {
+			std::cout << "xheapsort fails at " << i << std::endl;
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
